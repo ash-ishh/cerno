@@ -193,8 +193,12 @@ export class VideoDbClient {
   }
 
   async momentStream(videoId: string, start: number, end: number, videoLength: number) {
-    const safeStart = Math.max(0, start - 3);
-    const safeEnd = Math.max(safeStart + 1, Math.min(videoLength || end + 3, end + 3));
+    if (!Number.isFinite(start) || !Number.isFinite(end) || start < 0 || end <= start) {
+      throw new Error("VideoDB moment timestamps are invalid.");
+    }
+    const safeStart = Math.max(0, start);
+    const safeEnd = Math.min(videoLength > 0 ? videoLength : end, end);
+    if (safeEnd <= safeStart) throw new Error("VideoDB moment is outside the source duration.");
     return await this.request<{ stream_url?: string; player_url?: string }>(
       `video/${encodeURIComponent(videoId)}/stream`,
       {

@@ -10,7 +10,7 @@
 - `app/` is the production-path React/Vite application backed by a complete Convex schema.
 - Focus Threads, immutable run snapshots, candidates, fetched source chunks, claims, judgments, briefings, feedback, and TasteDoc versions persist in Convex and update the UI through subscriptions.
 - A scheduled Convex action uses LinkUp for live discovery and full primary-source fetches. Search snippets remain metadata only.
-- When the video lane is selected, the action sends at most one discovered long-form video to VideoDB, reuses its persisted asset ID, builds a spoken-word index, searches relevant moments, and retrieves timestamped transcript segments plus playable stream links.
+- When the video lane is selected, the action sends at most one discovered long-form video to VideoDB, reuses its persisted asset ID, builds a spoken-word index, searches relevant moments, and retrieves timestamped transcript segments. After one exact transcript segment passes publication validation, Cerno calls VideoDB stream generation with that segment’s start and end timestamps; it never substitutes the full-asset or search-result stream for an evidence clip.
 - The action submits fetched source excerpts, VideoDB transcript moments, and personal context to the restricted Azure-hosted Hermes Runs API. Hermes performs Director-led native `delegate_task` review; its run ID, usage, and delegation event are persisted.
 - Deterministic publication code exact-matches every evidence quote, builds a locator and content hash, and refuses to publish fewer than three validated findings when three sources are available.
 - Structured feedback creates either Focus Thread context or a reviewable TasteDoc proposal. Approval creates a new immutable TasteDoc version.

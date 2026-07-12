@@ -19,8 +19,9 @@ const HERMES_DEFAULT_URL = "https://cerno-hermes-74d2dc62.eastus.cloudapp.azure.
 function normalizeCandidateKey(value: unknown) {
   if (typeof value !== "string") return value;
   const key = value.trim().toUpperCase();
-  const match = key.match(/^C\s*[-_:#]?\s*0*(\d+)$/)
-    ?? key.match(/^(?:CANDIDATE|SOURCE)\s*[-_:#]?\s*0*(\d+)$/);
+  const match = key.match(/^C\s*0*(\d+)(?:\s*[-_.]\s*\d+)?$/)
+    ?? key.match(/^C\s*[-_:#]\s*0*(\d+)$/)
+    ?? key.match(/^(?:CANDIDATE|SOURCE)\s*[-_:#]?\s*0*(\d+)(?:\s*[-_.]\s*\d+)?$/);
   return match ? `C${Number(match[1])}` : key;
 }
 
@@ -56,7 +57,7 @@ const directorOutputSchema = z.object({
   rejections: z
     .array(
       z.object({
-        candidateKey: candidateKeySchema,
+        candidateKey: z.string().min(1).max(120),
         reason: z.string().min(10).max(500),
       }),
     )
@@ -64,10 +65,7 @@ const directorOutputSchema = z.object({
 });
 
 type DirectorOutput = z.infer<typeof directorOutputSchema>;
-type VideoSegment = VideoDbTranscriptSegment & {
-  streamUrl?: string;
-  playerUrl?: string;
-};
+type VideoSegment = VideoDbTranscriptSegment;
 
 type FetchedCandidate = {
   key: string;
@@ -81,8 +79,6 @@ type FetchedCandidate = {
     id: string;
     lengthSeconds: number;
     segments: VideoSegment[];
-    streamUrl?: string;
-    playerUrl?: string;
   };
 };
 
@@ -228,8 +224,6 @@ function videoSourceChunk(source: FetchedCandidate, requestedQuote: string) {
       hash: createHash("sha256").update(chunk).digest("hex"),
       startSeconds: segment.start,
       endSeconds: segment.end,
-      streamUrl: segment.streamUrl,
-      playerUrl: segment.playerUrl,
     };
   }
   return null;
@@ -525,12 +519,7 @@ export const execute = internalAction({
             let transcriptCharacters = 0;
             for (const segment of sourceSegments) {
               if (transcriptCharacters + segment.text.length > 10_000) break;
-              const shot = shots.find((item) => segment.start <= item.end && segment.end >= item.start);
-              segments.push({
-                ...segment,
-                streamUrl: shot?.streamUrl,
-                playerUrl: videoDbPlayerUrl(shot?.streamUrl, shot?.playerUrl),
-              });
+              segments.push(segment);
               transcriptCharacters += segment.text.length;
             }
             if (segments.length === 0 || transcriptCharacters < 200) {
@@ -561,8 +550,6 @@ export const execute = internalAction({
                 id: videoId,
                 lengthSeconds,
                 segments,
-                streamUrl,
-                playerUrl: videoDbPlayerUrl(streamUrl, suppliedPlayerUrl),
               },
             };
           }
@@ -763,13 +750,13 @@ export const execute = internalAction({
 
       const output = parseJsonOutput(hermesStatus.output);
       const sourceByKey = new Map(fetched.map((source) => [source.key, source]));
-      const used = new Set<string>();
+      const usedEvidence = new Set<string>();
       const validatedFindings = [];
       const failedValidation: { key: string; reason: string }[] = [];
       for (const finding of output.findings) {
         const source = sourceByKey.get(finding.candidateKey);
-        if (!source || used.has(finding.candidateKey)) {
-          failedValidation.push({ key: finding.candidateKey, reason: "Unknown or duplicate candidate reference." });
+        if (!source) {
+          failedValidation.push({ key: finding.candidateKey, reason: "Unknown candidate reference." });
           continue;
         }
         if (source.kind === "video") {
@@ -778,28 +765,31 @@ export const execute = internalAction({
             failedValidation.push({ key: finding.candidateKey, reason: "Evidence quote was not an exact substring of one timestamped VideoDB transcript segment." });
             continue;
           }
-          let streamUrl = videoChunk.streamUrl;
-          let playableUrl = videoChunk.playerUrl;
-          if (!streamUrl) {
-            try {
-              const stream = await videoDb.momentStream(
-                source.video.id,
-                videoChunk.startSeconds,
-                videoChunk.endSeconds,
-                source.video.lengthSeconds,
-              );
-              streamUrl = stream.stream_url;
-              playableUrl = videoDbPlayerUrl(streamUrl, stream.player_url);
-            } catch {
-              streamUrl = undefined;
-              playableUrl = undefined;
-            }
+          let streamUrl: string | undefined;
+          let playableUrl: string | undefined;
+          try {
+            const stream = await videoDb.momentStream(
+              source.video.id,
+              videoChunk.startSeconds,
+              videoChunk.endSeconds,
+              source.video.lengthSeconds,
+            );
+            streamUrl = stream.stream_url;
+            playableUrl = videoDbPlayerUrl(streamUrl, stream.player_url);
+          } catch {
+            streamUrl = undefined;
+            playableUrl = undefined;
           }
           if (!streamUrl || !playableUrl) {
             failedValidation.push({ key: finding.candidateKey, reason: "VideoDB transcript matched, but no playable timestamped evidence stream could be generated." });
             continue;
           }
-          used.add(finding.candidateKey);
+          const evidenceKey = `${finding.candidateKey}\u0000${videoChunk.exactQuote}`;
+          if (usedEvidence.has(evidenceKey)) {
+            failedValidation.push({ key: finding.candidateKey, reason: "Duplicate evidence passage." });
+            continue;
+          }
+          usedEvidence.add(evidenceKey);
           validatedFindings.push({
             candidateId: source.id,
             claim: finding.claim,
@@ -830,7 +820,12 @@ export const execute = internalAction({
           failedValidation.push({ key: finding.candidateKey, reason: "Evidence quote was not an exact source substring." });
           continue;
         }
-        used.add(finding.candidateKey);
+        const evidenceKey = `${finding.candidateKey}\u0000${exactQuote}`;
+        if (usedEvidence.has(evidenceKey)) {
+          failedValidation.push({ key: finding.candidateKey, reason: "Duplicate evidence passage." });
+          continue;
+        }
+        usedEvidence.add(evidenceKey);
         validatedFindings.push({
           candidateId: source.id,
           claim: finding.claim,

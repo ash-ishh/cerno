@@ -74,7 +74,7 @@ npm run build
 ## Current product boundaries
 
 - Live web, paper, and long-form video discovery begin through LinkUp.
-- One selected video per run is uploaded to VideoDB, spoken-word indexed, searched semantically, and exposed as exact timestamped transcript evidence with a playable stream.
+- One selected video per run is uploaded to VideoDB, spoken-word indexed, and searched semantically. Only after a transcript quote passes exact validation does Cerno call VideoDB stream generation with that segment’s start and end timestamps; full-asset and search-result streams are never published as evidence moments.
 - Hermes is bearer-protected on Azure and exposes only `delegation` and `todo` to API runs.
 - Firebase Google sign-in is wired to Convex token verification, and every public query/mutation resolves an identity-owned workspace. `AUTH_DISABLED` is limited to local development.
 - The current app still runs against a local anonymous Convex deployment. Public deployment requires linking `app/` to Convex cloud, configuring Firebase’s authorized domain, and deploying the Vite build.

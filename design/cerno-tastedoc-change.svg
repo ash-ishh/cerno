@@ -1,0 +1,183 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="1000" viewBox="0 0 1600 1000">
+  <defs>
+    <filter id="sheetShadow" x="-20%" y="-20%" width="140%" height="150%"><feDropShadow dx="0" dy="10" stdDeviation="18" flood-color="#16231f" flood-opacity="0.07"/></filter>
+    <filter id="softShadow" x="-30%" y="-30%" width="160%" height="180%"><feDropShadow dx="0" dy="5" stdDeviation="10" flood-color="#16231f" flood-opacity="0.08"/></filter>
+    <style>
+      .ui { font-family: "Avenir Next", "Manrope", "Helvetica Neue", sans-serif; fill: #182320; }
+      .prose { font-family: "Iowan Old Style", "Literata", Georgia, serif; fill: #182320; }
+      .mono { font-family: "SFMono-Regular", "IBM Plex Mono", Menlo, monospace; fill: #52605b; }
+      .muted { fill: #697671; }
+      .inverse { fill: #FCFDFC; }
+      .inverse-muted { fill: #AFC0BA; }
+      .hair { stroke: #D5DEDA; stroke-width: 1; }
+      .label { font-size: 11px; font-weight: 700; letter-spacing: 1.5px; }
+      .small { font-size: 12px; }
+      .body { font-size: 14px; }
+      .nav { font-size: 14px; font-weight: 600; }
+    </style>
+  </defs>
+
+  <rect width="1600" height="1000" fill="#F3F6F5"/>
+  <rect x="0" y="0" width="220" height="1000" fill="#FCFDFC"/>
+  <line x1="220" y1="0" x2="220" y2="1000" class="hair"/>
+
+  <!-- Brand -->
+  <g transform="translate(30 30)"><path d="M0 2 H26 M4 10 H22 M8 18 H18" stroke="#1C665A" stroke-width="2.4" stroke-linecap="round"/><text x="39" y="18" class="ui" font-size="17" font-weight="750" letter-spacing="2.2">CERNO</text></g>
+  <text x="31" y="81" class="mono small">PERSONAL INTELLIGENCE</text>
+
+  <!-- Nav -->
+  <g class="ui">
+    <circle cx="38" cy="142" r="5" fill="#91A09B"/><text x="57" y="147" class="nav muted">Briefings</text>
+    <path d="M33 193 h11 M38.5 187.5 v11" stroke="#75827d" stroke-width="1.8" stroke-linecap="round"/><text x="57" y="198" class="nav muted">Focus threads</text>
+    <rect x="16" y="223" width="188" height="42" rx="9" fill="#DCEBE7"/>
+    <path d="M33 238 h12 v14 h-12 z M36 242 h6 M36 246 h6" fill="none" stroke="#1C665A" stroke-width="1.5"/><text x="57" y="249" class="nav">TasteDoc</text>
+    <path d="M33 289 h13 M33 295 h9 M33 301 h11" stroke="#75827d" stroke-width="1.6" stroke-linecap="round"/><text x="57" y="300" class="nav muted">Research runs</text>
+    <path d="M33 340 l5 -5 5 5 5 -8" fill="none" stroke="#75827d" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><text x="57" y="346" class="nav muted">Evaluations</text>
+  </g>
+
+  <!-- Version list -->
+  <g transform="translate(17 405)">
+    <text x="13" y="0" class="ui label muted">VERSIONS</text>
+    <rect x="0" y="20" width="187" height="70" rx="11" fill="#F3F6F5" stroke="#BDD4CE"/>
+    <circle cx="18" cy="43" r="5" fill="#D79A42"/><text x="31" y="47" class="ui" font-size="12" font-weight="700">v4 · proposed</text>
+    <text x="16" y="70" class="ui" font-size="11" fill="#697671">Awaiting your review</text>
+    <circle cx="18" cy="119" r="5" fill="#1C665A"/><text x="31" y="123" class="ui" font-size="12" font-weight="650">v3 · current</text>
+    <text x="16" y="146" class="ui" font-size="11" fill="#697671">12 Jul · 09:14</text>
+    <circle cx="18" cy="178" r="5" fill="#91A09B"/><text x="31" y="182" class="ui" font-size="12" font-weight="650">v2</text>
+    <text x="16" y="205" class="ui" font-size="11" fill="#697671">Evidence bar revised</text>
+    <circle cx="18" cy="237" r="5" fill="#91A09B"/><text x="31" y="241" class="ui" font-size="12" font-weight="650">v1</text>
+    <text x="16" y="264" class="ui" font-size="11" fill="#697671">Initial calibration</text>
+  </g>
+
+  <g transform="translate(17 893)">
+    <rect width="187" height="78" rx="12" fill="#182320"/>
+    <circle cx="18" cy="23" r="4" fill="#7FC2B3"/>
+    <text x="31" y="27" class="ui inverse" font-size="12" font-weight="700">Taste is user-owned</text>
+    <text x="15" y="51" class="mono inverse-muted" font-size="10">0 automatic changes</text>
+    <text x="15" y="67" class="mono inverse-muted" font-size="10">3 approved versions</text>
+  </g>
+
+  <!-- Top bar -->
+  <text x="254" y="37" class="ui" font-size="12" font-weight="700" fill="#1C665A">TASTE &amp; JUDGMENT</text>
+  <text x="254" y="60" class="ui" font-size="15" font-weight="650">TasteDoc · Proposal 019</text>
+  <rect x="1355" y="22" width="103" height="42" rx="10" fill="#FCFDFC" stroke="#D5DEDA"/>
+  <text x="1406" y="48" text-anchor="middle" class="ui" font-size="12" font-weight="700">Edit draft</text>
+  <rect x="1470" y="22" width="98" height="42" rx="10" fill="#182320"/>
+  <text x="1519" y="48" text-anchor="middle" class="ui inverse" font-size="12" font-weight="700">TasteDoc</text>
+  <line x1="220" y1="84" x2="1600" y2="84" class="hair"/>
+
+  <!-- Main sheet -->
+  <g filter="url(#sheetShadow)"><rect x="248" y="106" width="884" height="866" rx="15" fill="#FCFDFC"/></g>
+  <text x="282" y="144" class="mono label" fill="#1C665A">CHANGE PROPOSAL 019  ·  FEEDBACK EVENT 041</text>
+  <text x="282" y="181" class="ui" font-size="28" font-weight="700" letter-spacing="-0.6">A correction becomes a rule only after review</text>
+  <text x="282" y="210" class="prose" font-size="15" fill="#65726d">Cerno proposes a narrow, readable change. Nothing has been applied yet.</text>
+  <line x1="282" y1="235" x2="1098" y2="235" class="hair"/>
+
+  <!-- Feedback event -->
+  <g>
+    <text x="282" y="270" class="ui label muted">YOUR CORRECTION</text>
+    <rect x="282" y="286" width="816" height="144" rx="12" fill="#F7F9F8" stroke="#D5DEDA"/>
+    <text x="306" y="315" class="mono" font-size="9">BRIEFING 0047 · ITEM 08</text>
+    <text x="306" y="344" class="prose" font-size="18" font-weight="600">“A complete guide to agent memory”</text>
+    <text x="306" y="370" class="ui small muted">Cerno picked it for source trust and focus relevance.</text>
+    <rect x="306" y="390" width="162" height="26" rx="8" fill="#F3E5E2"/>
+    <circle cx="322" cy="403" r="5" fill="#A45C52"/>
+    <text x="334" y="407" class="ui" font-size="11" font-weight="700" fill="#8D4941">Too introductory for me</text>
+    <text x="493" y="407" class="ui small muted">“I need implementation details and failure analysis, not another primer.”</text>
+  </g>
+
+  <!-- Connector -->
+  <line x1="690" y1="430" x2="690" y2="461" stroke="#8FB5AC" stroke-width="1.5"/>
+  <circle cx="690" cy="449" r="5" fill="#1C665A"/>
+
+  <!-- Diff card -->
+  <g>
+    <rect x="282" y="461" width="816" height="346" rx="12" fill="#FCFDFC" stroke="#BDD4CE"/>
+    <rect x="282" y="461" width="816" height="52" rx="12" fill="#F0F7F5"/>
+    <path d="M282 501 V473 Q282 461 294 461 H1086 Q1098 461 1098 473 V501" fill="#F0F7F5"/>
+    <circle cx="306" cy="487" r="7" fill="#1C665A"/>
+    <text x="323" y="491" class="ui" font-size="13" font-weight="700">Taste Editor proposal</text>
+    <text x="955" y="491" class="mono" font-size="10">v3 → v4</text>
+    <rect x="1022" y="476" width="57" height="22" rx="7" fill="#FBF5EA"/>
+    <text x="1050" y="491" text-anchor="middle" class="mono" font-size="9" fill="#B2762F">DRAFT</text>
+
+    <text x="306" y="548" class="mono" font-size="11" fill="#697671">@@ Quality bar / Technical depth @@</text>
+    <rect x="306" y="568" width="768" height="50" rx="8" fill="#FAEFED"/>
+    <text x="321" y="589" class="mono" font-size="11" fill="#A45C52">− Prefer technically substantive content over general explainers.</text>
+    <text x="321" y="607" class="mono" font-size="9" fill="#9A7771">  Broad rule; does not explain what “substantive” means for this reader.</text>
+
+    <rect x="306" y="628" width="768" height="82" rx="8" fill="#EAF4F1"/>
+    <text x="321" y="649" class="mono" font-size="11" fill="#1C665A">+ For agent infrastructure, prefer implementation details, benchmarks,</text>
+    <text x="321" y="669" class="mono" font-size="11" fill="#1C665A">+ and failure analysis over conceptual primers.</text>
+    <text x="321" y="697" class="mono" font-size="9" fill="#5B7C74">  Scope: durable taste · applies across Focus Threads · confidence: medium</text>
+
+    <line x1="306" y1="734" x2="1074" y2="734" class="hair"/>
+    <text x="306" y="762" class="ui label muted">WHY THIS WORDING</text>
+    <text x="306" y="786" class="ui small muted">It captures the reason you gave without inferring a dislike of the author, format, or topic.</text>
+  </g>
+
+  <!-- Actions -->
+  <g>
+    <rect x="282" y="837" width="116" height="42" rx="10" fill="#FCFDFC" stroke="#D5DEDA"/>
+    <text x="340" y="863" text-anchor="middle" class="ui" font-size="12" font-weight="700">Reject</text>
+    <rect x="410" y="837" width="132" height="42" rx="10" fill="#FCFDFC" stroke="#9EBAB3"/>
+    <text x="476" y="863" text-anchor="middle" class="ui" font-size="12" font-weight="700" fill="#1C665A">Edit wording</text>
+    <rect x="868" y="837" width="230" height="42" rx="10" fill="#1C665A"/>
+    <text x="983" y="863" text-anchor="middle" class="ui inverse" font-size="12" font-weight="700">Approve and create v4</text>
+    <text x="282" y="913" class="ui small muted">Approval versions the document and re-ranks the current candidate pool. It does not retrain a hidden model.</text>
+  </g>
+
+  <!-- Right impact panel -->
+  <g filter="url(#softShadow)"><rect x="1154" y="106" width="414" height="866" rx="15" fill="#FCFDFC"/></g>
+  <g>
+    <text x="1188" y="146" class="ui label" fill="#1C665A">IMPACT PREVIEW</text>
+    <text x="1188" y="181" class="ui" font-size="21" font-weight="700">What would change</text>
+    <rect x="1188" y="201" width="346" height="59" rx="10" fill="#FBF5EA" stroke="#E6D1AB"/>
+    <circle cx="1210" cy="224" r="6" fill="#D79A42"/>
+    <text x="1227" y="228" class="ui" font-size="12" font-weight="700">Preview only</text>
+    <text x="1210" y="248" class="ui" font-size="11" fill="#7B6A4C">Current briefing remains unchanged until approval.</text>
+
+    <text x="1188" y="303" class="ui label muted">CURRENT CANDIDATE POOL</text>
+    <g transform="translate(1188 323)">
+      <rect width="346" height="68" rx="10" fill="#F0F7F5"/>
+      <text x="16" y="22" class="ui" font-size="11" font-weight="700">Memory evaluation benchmark</text>
+      <text x="16" y="45" class="ui small muted">Implementation + primary evidence</text>
+      <text x="281" y="28" class="mono" font-size="10">#3</text>
+      <path d="M301 25 H323 M318 20 l5 5 -5 5" fill="none" stroke="#1C665A" stroke-width="1.4"/>
+      <text x="327" y="28" class="mono" font-size="10" fill="#1C665A">#1</text>
+
+      <rect y="78" width="346" height="68" rx="10" fill="#F7F9F8"/>
+      <text x="16" y="100" class="ui" font-size="11" font-weight="700">Four-minute podcast moment</text>
+      <text x="16" y="123" class="ui small muted">Operational detail; rank unchanged</text>
+      <text x="281" y="106" class="mono" font-size="10">#2</text>
+      <path d="M301 103 H323" stroke="#697671" stroke-width="1.4"/>
+      <text x="327" y="106" class="mono" font-size="10">#2</text>
+
+      <rect y="156" width="346" height="68" rx="10" fill="#FAEFED"/>
+      <text x="16" y="178" class="ui" font-size="11" font-weight="700">A complete guide to agent memory</text>
+      <text x="16" y="201" class="ui small muted">Conceptual primer; falls below threshold</text>
+      <text x="274" y="184" class="mono" font-size="10">#1</text>
+      <path d="M296 181 H316 M311 176 l5 5 -5 5" fill="none" stroke="#A45C52" stroke-width="1.4"/>
+      <text x="324" y="184" class="mono" font-size="9" fill="#A45C52">REJECT</text>
+    </g>
+
+    <line x1="1188" y1="575" x2="1534" y2="575" class="hair"/>
+    <text x="1188" y="611" class="ui label muted">CHANGE PROVENANCE</text>
+    <line x1="1204" y1="638" x2="1204" y2="755" stroke="#80AA9F" stroke-width="1.5"/>
+    <circle cx="1204" cy="645" r="6" fill="#1C665A"/>
+    <text x="1227" y="649" class="ui" font-size="12" font-weight="700">Feedback event 041</text>
+    <text x="1227" y="668" class="mono" font-size="9">reason: too introductory</text>
+    <circle cx="1204" cy="704" r="6" fill="#FCFDFC" stroke="#1C665A" stroke-width="2"/>
+    <text x="1227" y="708" class="ui" font-size="12" font-weight="700">Taste Editor proposal</text>
+    <text x="1227" y="727" class="mono" font-size="9">narrowed to technical depth</text>
+    <circle cx="1204" cy="758" r="6" fill="#FCFDFC" stroke="#D79A42" stroke-width="2"/>
+    <text x="1227" y="762" class="ui" font-size="12" font-weight="700">Awaiting your approval</text>
+
+    <line x1="1188" y1="800" x2="1534" y2="800" class="hair"/>
+    <text x="1188" y="836" class="ui label muted">SCOPE GUARD</text>
+    <rect x="1188" y="852" width="346" height="79" rx="10" fill="#F3F6F5"/>
+    <text x="1204" y="875" class="ui" font-size="12" font-weight="700">Durable taste, not current focus</text>
+    <text x="1204" y="897" class="ui small muted">“Not right now” would update Focus Thread context</text>
+    <text x="1204" y="916" class="ui small muted">instead and would never enter the TasteDoc.</text>
+  </g>
+</svg>

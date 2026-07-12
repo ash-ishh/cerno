@@ -1,0 +1,247 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="1000" viewBox="0 0 1600 1000">
+  <defs>
+    <filter id="sheetShadow" x="-20%" y="-20%" width="140%" height="150%">
+      <feDropShadow dx="0" dy="10" stdDeviation="18" flood-color="#16231f" flood-opacity="0.07"/>
+    </filter>
+    <filter id="softShadow" x="-30%" y="-30%" width="160%" height="180%">
+      <feDropShadow dx="0" dy="5" stdDeviation="10" flood-color="#16231f" flood-opacity="0.08"/>
+    </filter>
+    <style>
+      .ui { font-family: "Avenir Next", "Manrope", "Helvetica Neue", sans-serif; fill: #182320; }
+      .prose { font-family: "Iowan Old Style", "Literata", Georgia, serif; fill: #182320; }
+      .mono { font-family: "SFMono-Regular", "IBM Plex Mono", Menlo, monospace; fill: #52605b; }
+      .muted { fill: #697671; }
+      .inverse { fill: #FCFDFC; }
+      .inverse-muted { fill: #AFC0BA; }
+      .hair { stroke: #D5DEDA; stroke-width: 1; }
+      .label { font-size: 11px; font-weight: 700; letter-spacing: 1.5px; }
+      .small { font-size: 12px; }
+      .body { font-size: 14px; }
+      .nav { font-size: 14px; font-weight: 600; }
+    </style>
+  </defs>
+
+  <!-- App shell -->
+  <rect width="1600" height="1000" fill="#F3F6F5"/>
+  <rect x="0" y="0" width="220" height="1000" fill="#FCFDFC"/>
+  <line x1="220" y1="0" x2="220" y2="1000" class="hair"/>
+
+  <!-- Brand -->
+  <g transform="translate(30 30)">
+    <path d="M0 2 H26 M4 10 H22 M8 18 H18" stroke="#1C665A" stroke-width="2.4" stroke-linecap="round"/>
+    <text x="39" y="18" class="ui" font-size="17" font-weight="750" letter-spacing="2.2">CERNO</text>
+  </g>
+  <text x="31" y="81" class="mono small" letter-spacing="0.2">PERSONAL INTELLIGENCE</text>
+
+  <!-- Left navigation -->
+  <g class="ui">
+    <rect x="16" y="121" width="188" height="42" rx="9" fill="#DCEBE7"/>
+    <circle cx="38" cy="142" r="5" fill="#1C665A"/>
+    <text x="57" y="147" class="nav">Briefings</text>
+
+    <path d="M33 193 h11 M38.5 187.5 v11" stroke="#75827d" stroke-width="1.8" stroke-linecap="round"/>
+    <text x="57" y="198" class="nav muted">Focus threads</text>
+
+    <path d="M33 238 h12 v14 h-12 z M36 242 h6 M36 246 h6" fill="none" stroke="#75827d" stroke-width="1.5"/>
+    <text x="57" y="249" class="nav muted">TasteDoc</text>
+
+    <path d="M33 289 h13 M33 295 h9 M33 301 h11" stroke="#75827d" stroke-width="1.6" stroke-linecap="round"/>
+    <text x="57" y="300" class="nav muted">Research runs</text>
+
+    <path d="M33 340 l5 -5 5 5 5 -8" fill="none" stroke="#75827d" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+    <text x="57" y="346" class="nav muted">Evaluations</text>
+  </g>
+
+  <!-- Active focus card -->
+  <g transform="translate(17 406)">
+    <text x="13" y="0" class="ui label muted">ACTIVE FOCUS</text>
+    <rect x="0" y="18" width="187" height="132" rx="12" fill="#F3F6F5" stroke="#D5DEDA"/>
+    <circle cx="19" cy="39" r="4" fill="#1C665A"/>
+    <text x="31" y="43" class="mono" font-size="10">THREAD 07</text>
+    <text x="16" y="70" class="ui" font-size="13" font-weight="700">
+      <tspan x="16" dy="0">Long-term memory</tspan>
+      <tspan x="16" dy="18">for production agents</tspan>
+    </text>
+    <text x="16" y="116" class="ui small muted">Exploration budget</text>
+    <rect x="16" y="126" width="120" height="4" rx="2" fill="#D5DEDA"/>
+    <rect x="16" y="126" width="22" height="4" rx="2" fill="#D79A42"/>
+    <text x="145" y="131" class="mono" font-size="10">15%</text>
+  </g>
+
+  <!-- Bottom status -->
+  <g transform="translate(17 893)">
+    <rect width="187" height="78" rx="12" fill="#182320"/>
+    <circle cx="18" cy="23" r="4" fill="#7FC2B3"/>
+    <text x="31" y="27" class="ui inverse" font-size="12" font-weight="700">Research desk online</text>
+    <text x="15" y="51" class="mono inverse-muted" font-size="10">3 agents · 9 sources</text>
+    <text x="15" y="67" class="mono inverse-muted" font-size="10">last run 2m ago</text>
+  </g>
+
+  <!-- Top bar -->
+  <g>
+    <text x="254" y="37" class="ui" font-size="12" font-weight="700" fill="#1C665A">FOCUS THREAD</text>
+    <text x="254" y="60" class="ui" font-size="15" font-weight="650">Long-term memory for production agents</text>
+    <path d="M580 50 l5 5 5 -5" fill="none" stroke="#697671" stroke-width="1.5" stroke-linecap="round"/>
+
+    <rect x="1277" y="22" width="141" height="42" rx="10" fill="#FCFDFC" stroke="#D5DEDA"/>
+    <path d="M1295 43 a7 7 0 1 1 3 6" fill="none" stroke="#1C665A" stroke-width="1.7"/>
+    <path d="M1292 47 l6 2 -1 -6" fill="#1C665A"/>
+    <text x="1311" y="48" class="ui" font-size="13" font-weight="700">Run fresh brief</text>
+
+    <circle cx="1451" cy="43" r="18" fill="#DCEBE7"/>
+    <text x="1451" y="48" text-anchor="middle" class="ui" font-size="12" font-weight="750" fill="#1C665A">AS</text>
+    <rect x="1484" y="24" width="84" height="38" rx="9" fill="#182320"/>
+    <text x="1526" y="48" text-anchor="middle" class="ui inverse" font-size="12" font-weight="700">Share</text>
+  </g>
+  <line x1="220" y1="84" x2="1600" y2="84" class="hair"/>
+
+  <!-- Briefing sheet -->
+  <g filter="url(#sheetShadow)">
+    <rect x="248" y="106" width="850" height="866" rx="15" fill="#FCFDFC"/>
+  </g>
+
+  <!-- Briefing header -->
+  <g>
+    <text x="286" y="146" class="mono label" fill="#1C665A">BRIEFING  ·  12 JUL 2026  ·  07:42</text>
+    <text x="286" y="189" class="ui" font-size="29" font-weight="700" letter-spacing="-0.7">What changed in durable agent memory</text>
+    <text x="286" y="219" class="prose" font-size="15" fill="#65726d">Four findings from nine sources. Estimated attention: 11 minutes.</text>
+    <g transform="translate(876 136)">
+      <rect width="181" height="70" rx="11" fill="#F3F6F5"/>
+      <text x="16" y="24" class="mono" font-size="10">RESEARCH RUN</text>
+      <text x="16" y="48" class="ui" font-size="13" font-weight="700">Completed in 01:18</text>
+      <circle cx="157" cy="25" r="6" fill="#1C665A"/>
+    </g>
+    <line x1="286" y1="249" x2="1060" y2="249" class="hair"/>
+  </g>
+
+  <!-- Selected must know finding -->
+  <g>
+    <rect x="271" y="269" width="804" height="238" rx="13" fill="#F0F7F5" stroke="#BFD8D1" stroke-width="1.2"/>
+    <rect x="271" y="269" width="4" height="238" rx="2" fill="#1C665A"/>
+    <text x="296" y="301" class="ui label" fill="#1C665A">MUST KNOW NOW</text>
+    <text x="296" y="342" class="prose" font-size="23" font-weight="600">
+      <tspan x="296" dy="0">Memory evaluation is moving from retrieval</tspan>
+      <tspan x="296" dy="30">accuracy to task-level durability.</tspan>
+    </text>
+    <text x="296" y="418" class="prose" font-size="15" fill="#4D5B56">
+      <tspan x="296" dy="0">Three production reports now measure whether an agent preserves decisions across</tspan>
+      <tspan x="296" dy="22">multi-day work, not merely whether it can retrieve a stored fact.</tspan>
+    </text>
+
+    <g transform="translate(296 463)">
+      <rect width="86" height="25" rx="7" fill="#DCEBE7"/>
+      <text x="43" y="17" text-anchor="middle" class="ui" font-size="11" font-weight="700" fill="#1C665A">NEW TO YOU</text>
+      <rect x="95" width="120" height="25" rx="7" fill="#FCFDFC" stroke="#D5DEDA"/>
+      <text x="155" y="17" text-anchor="middle" class="ui" font-size="11" font-weight="650">PRIMARY EVIDENCE</text>
+      <rect x="224" width="62" height="25" rx="7" fill="#FCFDFC" stroke="#D5DEDA"/>
+      <text x="255" y="17" text-anchor="middle" class="mono" font-size="10">3 MIN</text>
+    </g>
+
+    <g transform="translate(810 455)">
+      <circle cx="11" cy="12" r="11" fill="#182320"/>
+      <path d="M7 12 h8 M11 8 l4 4 -4 4" stroke="#FCFDFC" stroke-width="1.3" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+      <text x="33" y="16" class="ui" font-size="12" font-weight="700">Open evidence</text>
+    </g>
+  </g>
+
+  <!-- Exact moment -->
+  <g>
+    <text x="286" y="552" class="ui label" fill="#1C665A">EXACT MOMENT</text>
+    <rect x="286" y="573" width="160" height="112" rx="11" fill="#21332E"/>
+    <circle cx="366" cy="621" r="23" fill="#FCFDFC" fill-opacity="0.92"/>
+    <path d="M361 611 l15 10 -15 10 z" fill="#1C665A"/>
+    <rect x="302" y="658" width="128" height="4" rx="2" fill="#60716B"/>
+    <rect x="302" y="658" width="72" height="4" rx="2" fill="#D79A42"/>
+    <text x="302" y="679" class="mono inverse-muted" font-size="9">38:12 — 42:06</text>
+
+    <text x="470" y="594" class="ui" font-size="11" font-weight="700" fill="#697671">LATENT SPACE · EP. 118</text>
+    <text x="470" y="627" class="prose" font-size="19" font-weight="600">
+      <tspan x="470" dy="0">The four-minute distinction between</tspan>
+      <tspan x="470" dy="25">episodic memory and operational state</tspan>
+    </text>
+    <text x="470" y="681" class="ui body muted">Worth watching because it changes the storage boundary in your current design.</text>
+    <line x1="286" y1="714" x2="1060" y2="714" class="hair"/>
+  </g>
+
+  <!-- Archive -->
+  <g>
+    <text x="286" y="752" class="ui label" fill="#1C665A">FROM YOUR ARCHIVE</text>
+    <text x="286" y="786" class="prose" font-size="19" font-weight="600">A 2024 failure taxonomy is newly useful for your evaluation plan.</text>
+    <text x="286" y="816" class="ui body muted">Saved 19 months ago · resurfaced because two new reports use the same failure classes.</text>
+    <text x="929" y="787" class="mono" font-size="10">ARCHIVE / 034</text>
+    <line x1="286" y1="844" x2="1060" y2="844" class="hair"/>
+  </g>
+
+  <!-- Rejected -->
+  <g>
+    <text x="286" y="882" class="ui label" fill="#A45C52">REJECTED AS NOISE</text>
+    <circle cx="295" cy="913" r="9" fill="#F3E5E2"/>
+    <path d="M291 909 l8 8 M299 909 l-8 8" stroke="#A45C52" stroke-width="1.4"/>
+    <text x="316" y="918" class="ui body" font-weight="650">“A complete guide to agent memory”</text>
+    <text x="600" y="918" class="ui small muted">92% claim overlap with two items already in your index.</text>
+    <text x="964" y="918" class="mono" font-size="10" fill="#A45C52">REDUNDANT</text>
+    <text x="286" y="950" class="ui small muted">2 more candidates rejected: introductory (1), source unavailable (1)</text>
+  </g>
+
+  <!-- Evidence inspector -->
+  <g filter="url(#softShadow)">
+    <rect x="1124" y="106" width="444" height="866" rx="15" fill="#FCFDFC"/>
+  </g>
+  <g>
+    <text x="1160" y="146" class="ui label" fill="#1C665A">CERNO'S JUDGMENT</text>
+    <text x="1160" y="183" class="ui" font-size="21" font-weight="700">Why this made the cut</text>
+    <text x="1160" y="211" class="prose" font-size="14" fill="#596761">
+      <tspan x="1160" dy="0">It answers the active thread at your level and</tspan>
+      <tspan x="1160" dy="21">adds an evaluation frame absent from your index.</tspan>
+    </text>
+
+    <!-- score bars -->
+    <g transform="translate(1160 267)">
+      <text x="0" y="0" class="mono" font-size="10">FOCUS RELEVANCE</text><text x="356" y="0" text-anchor="end" class="mono" font-size="10" fill="#1C665A">92</text>
+      <rect x="0" y="10" width="356" height="5" rx="2.5" fill="#E2E8E5"/><rect x="0" y="10" width="328" height="5" rx="2.5" fill="#1C665A"/>
+      <text x="0" y="42" class="mono" font-size="10">TASTE FIT</text><text x="356" y="42" text-anchor="end" class="mono" font-size="10">84</text>
+      <rect x="0" y="52" width="356" height="5" rx="2.5" fill="#E2E8E5"/><rect x="0" y="52" width="299" height="5" rx="2.5" fill="#4D887E"/>
+      <text x="0" y="84" class="mono" font-size="10">NOVELTY</text><text x="356" y="84" text-anchor="end" class="mono" font-size="10">88</text>
+      <rect x="0" y="94" width="356" height="5" rx="2.5" fill="#E2E8E5"/><rect x="0" y="94" width="313" height="5" rx="2.5" fill="#4D887E"/>
+      <text x="0" y="126" class="mono" font-size="10">EVIDENCE QUALITY</text><text x="356" y="126" text-anchor="end" class="mono" font-size="10" fill="#B2762F">79</text>
+      <rect x="0" y="136" width="356" height="5" rx="2.5" fill="#E2E8E5"/><rect x="0" y="136" width="281" height="5" rx="2.5" fill="#D79A42"/>
+    </g>
+
+    <line x1="1160" y1="432" x2="1532" y2="432" class="hair"/>
+    <text x="1160" y="467" class="ui label muted">EVIDENCE SPINE</text>
+
+    <!-- spine -->
+    <line x1="1176" y1="495" x2="1176" y2="752" stroke="#80AA9F" stroke-width="1.5"/>
+
+    <circle cx="1176" cy="505" r="6" fill="#1C665A"/>
+    <text x="1200" y="509" class="ui" font-size="12" font-weight="700">Claim selected</text>
+    <text x="1200" y="528" class="mono" font-size="9">claim_8F2 · confidence 0.86</text>
+
+    <circle cx="1176" cy="566" r="6" fill="#FCFDFC" stroke="#1C665A" stroke-width="2"/>
+    <text x="1200" y="566" class="ui" font-size="12" font-weight="700">Exact passage</text>
+    <rect x="1200" y="579" width="330" height="70" rx="9" fill="#F3F6F5"/>
+    <text x="1215" y="600" class="prose" font-size="12" fill="#42504B">
+      <tspan x="1215" dy="0">“The relevant unit is whether a decision remains</tspan>
+      <tspan x="1215" dy="17">available to the agent after the workflow, model,</tspan>
+      <tspan x="1215" dy="17">and surrounding context have changed.”</tspan>
+    </text>
+
+    <circle cx="1176" cy="682" r="6" fill="#FCFDFC" stroke="#1C665A" stroke-width="2"/>
+    <text x="1200" y="681" class="ui" font-size="12" font-weight="700">Primary source</text>
+    <text x="1200" y="701" class="ui small muted">Letta · Memory benchmark report · §4.2</text>
+
+    <circle cx="1176" cy="744" r="6" fill="#FCFDFC" stroke="#D79A42" stroke-width="2"/>
+    <text x="1200" y="743" class="ui" font-size="12" font-weight="700">Compared with your index</text>
+    <text x="1200" y="763" class="ui small muted">Nearest claim covers retrieval, not durability.</text>
+
+    <line x1="1160" y1="798" x2="1532" y2="798" class="hair"/>
+    <text x="1160" y="833" class="ui label muted">TASTEDOC RULES USED</text>
+    <rect x="1160" y="850" width="177" height="28" rx="8" fill="#DCEBE7"/>
+    <text x="1248" y="868" text-anchor="middle" class="ui" font-size="11" font-weight="650" fill="#1C665A">Prefer implementation detail</text>
+    <rect x="1347" y="850" width="185" height="28" rx="8" fill="#F3F6F5" stroke="#D5DEDA"/>
+    <text x="1439" y="868" text-anchor="middle" class="ui" font-size="11" font-weight="650">Demand primary evidence</text>
+
+    <rect x="1160" y="911" width="372" height="41" rx="10" fill="#FCFDFC" stroke="#9EBAB3"/>
+    <text x="1346" y="936" text-anchor="middle" class="ui" font-size="13" font-weight="700" fill="#1C665A">Correct Cerno's reasoning</text>
+  </g>
+</svg>

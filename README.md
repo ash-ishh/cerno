@@ -1,10 +1,34 @@
-# Cerno
+<p align="center">
+  <img src="assets/cerno-banner.svg" alt="Cerno — the internet, distilled to a decision" width="100%">
+</p>
 
-> **Protect your attention by learning what “high signal” means to you.**
+<h1 align="center">Cerno</h1>
 
-Cerno is a personal intelligence system that reads, watches, and listens on your behalf. It learns your durable taste, understands what you are working on right now, and surfaces only the claims, resources, and moments worth your attention.
+<p align="center"><strong>The judgment layer between the internet and your attention.</strong></p>
+<p align="center"><code>FINITE BRIEFINGS</code> · <code>VISIBLE TASTE</code> · <code>CITED EVIDENCE</code> · <code>NO FEED</code></p>
 
-The name comes from the Latin *cernere*: to sift, distinguish, and decide.
+> **Most tools help you consume faster. Cerno decides what deserves to be consumed at all.**
+
+Cerno reads, watches, and listens on your behalf. It learns your durable taste, understands what you are working on right now, and returns only the claims, resources, and exact moments worth your attention—not another pile of summaries.
+
+<table>
+<tr>
+<td width="50%"><strong>🎯 Knows what matters now</strong><br><sub>Focus Threads separate today's mission from your long-term interests.</sub></td>
+<td width="50%"><strong>🧠 Knows what you already know</strong><br><sub>A personal index makes repetition visible instead of recommending it again.</sub></td>
+</tr>
+<tr>
+<td width="50%"><strong>⏱ Finds the moment, not just the source</strong><br><sub>Jump to the useful passage, claim, or timestamp inside long-form content.</sub></td>
+<td width="50%"><strong>🔎 Shows its work</strong><br><sub>Every selection exposes evidence, provenance, novelty, and the TasteDoc rules used.</sub></td>
+</tr>
+</table>
+
+<p align="center">
+  <img src="assets/cerno-live-briefing.png" alt="Live Cerno finite briefing with an inspectable evidence spine" width="100%">
+  <br>
+  <sub>A live LinkUp + Hermes run published three claims only after exact source passages passed deterministic validation.</sub>
+</p>
+
+The name comes from the Latin *cernere*: **to sift, distinguish, and decide.**
 
 ## Why Cerno
 
@@ -66,6 +90,8 @@ The objective is not to summarize everything. It is to decide what deserves deep
 ### 4. Receive a finite briefing
 
 Cerno produces a concise briefing organized around your active work rather than an infinite feed.
+
+A **Focus Thread is context, not a feed**. One bounded Research Run can publish one canonical briefing. The global **Briefing Desk** is simply a cross-thread library of those documents; Focus Thread pages link to the same outputs rather than maintaining duplicate content streams. Cerno does not manufacture a Daily Brief merely because another day has passed.
 
 A briefing can include:
 
@@ -215,6 +241,12 @@ Broader source integrations, automatic history imports, continuous monitoring, c
 
 Cerno exists to help you consume less, understand more, and preserve the knowledge that matters.
 
+## Running implementation
+
+The production-path application now lives in [`app/`](app/). It uses Convex as canonical product memory, LinkUp for live discovery and full source fetches, and the restricted Azure-hosted Hermes runtime for Director-led specialist delegation. The verified local flow publishes three claims only after each quote is matched to fetched primary-source text, then turns explicit feedback into a reviewed TasteDoc version. IDs, usage, evidence hashes, and the honesty boundary are recorded in [`docs/LIVE-VERIFICATION.md`](docs/LIVE-VERIFICATION.md).
+
+The earlier [`prototype/`](prototype/) remains a fixture-only design artifact and is not imported by the application.
+
 ## Status
 
-Cerno is in early development. The immediate goal is to make it reliably useful for one person and one real research workflow before expanding its sources, surfaces, or audience.
+The complete single-user workflow runs locally against live services. Public deployment still requires connecting `app/` to a Convex cloud project; authentication and the VideoDB evidence lane remain intentionally outside the current cut.

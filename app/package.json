@@ -1,0 +1,36 @@
+{
+  "name": "cerno-app",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "dev": "convex dev --start 'vite --host 0.0.0.0 --port 4180'",
+    "dev:web": "vite --host 0.0.0.0 --port 4180",
+    "convex:dev": "convex dev",
+    "build": "tsc -b && vite build",
+    "preview": "vite preview --host 0.0.0.0 --port 4180",
+    "typecheck": "tsc -b --pretty false && tsc -p convex/tsconfig.json --noEmit --pretty false"
+  },
+  "dependencies": {
+    "@x402/core": "^2.18.0",
+    "@x402/evm": "^2.18.0",
+    "convex": "^1.42.1",
+    "linkup-sdk": "^3.2.7",
+    "lucide-react": "^0.468.0",
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0",
+    "viem": "^2.55.1",
+    "zod": "^3.24.1"
+  },
+  "devDependencies": {
+    "@types/node": "^22.20.1",
+    "@types/react": "^19.0.6",
+    "@types/react-dom": "^19.0.3",
+    "@vitejs/plugin-react": "^5.1.1",
+    "typescript": "^5.7.3",
+    "vite": "^7.3.6"
+  }
+}

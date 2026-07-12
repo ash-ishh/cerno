@@ -1,0 +1,72 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="560" viewBox="0 0 1600 560" role="img" aria-labelledby="title desc">
+  <title id="title">Cerno — the internet, distilled to a decision</title>
+  <desc id="desc">Streams of papers, videos, podcasts, and feeds pass through Cerno and emerge as a small evidence-backed briefing.</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#101b18"/>
+      <stop offset="1" stop-color="#1d322d"/>
+    </linearGradient>
+    <linearGradient id="signal" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#79c7b8" stop-opacity=".18"/>
+      <stop offset="1" stop-color="#79c7b8" stop-opacity=".9"/>
+    </linearGradient>
+    <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="7" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+
+  <rect width="1600" height="560" rx="24" fill="url(#bg)"/>
+  <path d="M0 435 C340 385 515 505 820 450 S1290 370 1600 430 V560 H0Z" fill="#203c35" opacity=".38"/>
+  <path d="M0 474 C310 430 560 540 870 474 S1320 425 1600 468" fill="none" stroke="#79c7b8" stroke-opacity=".09" stroke-width="2"/>
+
+  <!-- incoming information -->
+  <g font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="13" letter-spacing="2" fill="#92a49f">
+    <text x="78" y="111">PAPERS</text><text x="78" y="203">VIDEO</text>
+    <text x="78" y="295">PODCASTS</text><text x="78" y="387">FEEDS</text>
+  </g>
+  <g fill="none" stroke="#69817b" stroke-width="2" stroke-linecap="round">
+    <path d="M78 130 H345 L485 222"/><path d="M78 222 H360 L485 246"/>
+    <path d="M78 314 H360 L485 270"/><path d="M78 406 H345 L485 294"/>
+  </g>
+  <g fill="#69817b">
+    <circle cx="158" cy="130" r="4"/><circle cx="224" cy="130" r="4"/><circle cx="305" cy="130" r="4"/>
+    <circle cx="142" cy="222" r="4"/><circle cx="256" cy="222" r="4"/><circle cx="330" cy="222" r="4"/>
+    <circle cx="130" cy="314" r="4"/><circle cx="205" cy="314" r="4"/><circle cx="314" cy="314" r="4"/>
+    <circle cx="170" cy="406" r="4"/><circle cx="270" cy="406" r="4"/><circle cx="330" cy="406" r="4"/>
+  </g>
+
+  <!-- sieve / judgment mark -->
+  <g transform="translate(535 183)">
+    <circle cx="80" cy="80" r="78" fill="#142520" stroke="#79c7b8" stroke-opacity=".55" stroke-width="2"/>
+    <circle cx="80" cy="80" r="54" fill="none" stroke="#79c7b8" stroke-opacity=".25"/>
+    <path d="M47 57 H113 M55 80 H105 M66 103 H94" fill="none" stroke="#9ce1d3" stroke-width="7" stroke-linecap="round" filter="url(#glow)"/>
+  </g>
+
+  <!-- distilled signal -->
+  <path d="M695 263 H870" stroke="url(#signal)" stroke-width="3"/>
+  <circle cx="802" cy="263" r="5" fill="#9ce1d3" filter="url(#glow)"/>
+
+  <!-- finite briefing -->
+  <g transform="translate(870 82)">
+    <rect width="640" height="392" rx="16" fill="#f8fbfa"/>
+    <rect x="0" y="0" width="9" height="392" rx="4" fill="#2b7568"/>
+    <text x="48" y="54" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="13" font-weight="700" letter-spacing="2.5" fill="#2b7568">FINITE BRIEFING · 11 MIN</text>
+    <text x="48" y="103" font-family="Georgia, serif" font-size="31" font-weight="700" fill="#182320">Only what changes the decision.</text>
+    <line x1="48" y1="132" x2="592" y2="132" stroke="#d5deda"/>
+
+    <circle cx="62" cy="177" r="7" fill="#2b7568"/>
+    <text x="86" y="182" font-family="ui-sans-serif, system-ui, sans-serif" font-size="18" font-weight="700" fill="#182320">Must know now</text>
+    <text x="86" y="207" font-family="Georgia, serif" font-size="15" fill="#586762">A new claim, backed by primary evidence.</text>
+
+    <circle cx="62" cy="253" r="7" fill="#d79a42"/>
+    <text x="86" y="258" font-family="ui-sans-serif, system-ui, sans-serif" font-size="18" font-weight="700" fill="#182320">Exact moment</text>
+    <text x="86" y="283" font-family="Georgia, serif" font-size="15" fill="#586762">The four minutes worth watching.</text>
+
+    <circle cx="62" cy="329" r="7" fill="#a45c52"/>
+    <text x="86" y="334" font-family="ui-sans-serif, system-ui, sans-serif" font-size="18" font-weight="700" fill="#182320">Rejected as noise</text>
+    <text x="86" y="359" font-family="Georgia, serif" font-size="15" fill="#586762">Already known · introductory · weak evidence</text>
+  </g>
+
+  <text x="78" y="513" font-family="ui-sans-serif, system-ui, sans-serif" font-size="15" font-weight="700" letter-spacing="4" fill="#c8d8d4">THE INTERNET, DISTILLED TO A DECISION.</text>
+</svg>

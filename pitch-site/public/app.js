@@ -23,25 +23,6 @@ const revealObserver = new IntersectionObserver((entries, observer) => {
 
 document.querySelectorAll('.reveal').forEach((element) => revealObserver.observe(element));
 
-const demoButtons = [...document.querySelectorAll('[data-demo]')];
-const demoShots = [...document.querySelectorAll('[data-shot]')];
-
-demoButtons.forEach((button) => {
-  button.addEventListener('click', () => {
-    const target = button.dataset.demo;
-    demoButtons.forEach((item) => {
-      const selected = item === button;
-      item.classList.toggle('active', selected);
-      item.setAttribute('aria-selected', String(selected));
-    });
-    demoShots.forEach((shot) => {
-      const selected = shot.dataset.shot === target;
-      shot.hidden = !selected;
-      shot.classList.toggle('active', selected);
-    });
-  });
-});
-
 const loopSteps = [...document.querySelectorAll('[data-step]')];
 const loopLabels = ['Focus Thread', 'Live discovery', 'Personal judgment', 'Finite briefing'];
 const loopNodes = [...document.querySelectorAll('.loop-node')];
@@ -77,7 +58,7 @@ if (loopSteps.length) {
 }
 
 // Keyboard-friendly presentation navigation between major sections.
-const presentationSections = ['top', 'product', 'demo', 'agency', 'proof', 'stack'];
+const presentationSections = ['top', 'product', 'agency', 'proof', 'stack'];
 document.addEventListener('keydown', (event) => {
   if (!['ArrowDown', 'PageDown', 'ArrowUp', 'PageUp'].includes(event.key)) return;
   if (['INPUT', 'TEXTAREA', 'SELECT', 'BUTTON'].includes(document.activeElement?.tagName)) return;

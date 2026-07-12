@@ -16,8 +16,21 @@ import {
 
 const HERMES_DEFAULT_URL = "https://cerno-hermes-74d2dc62.eastus.cloudapp.azure.com";
 
+function normalizeCandidateKey(value: unknown) {
+  if (typeof value !== "string") return value;
+  const key = value.trim().toUpperCase();
+  const match = key.match(/^C\s*[-_:#]?\s*0*(\d+)$/)
+    ?? key.match(/^(?:CANDIDATE|SOURCE)\s*[-_:#]?\s*0*(\d+)$/);
+  return match ? `C${Number(match[1])}` : key;
+}
+
+const candidateKeySchema = z.preprocess(
+  normalizeCandidateKey,
+  z.string().regex(/^C[1-9]\d*$/),
+);
+
 const findingSchema = z.object({
-  candidateKey: z.string().regex(/^C\d+$/),
+  candidateKey: candidateKeySchema,
   claim: z.string().min(20).max(700),
   evidenceQuote: z.string().min(20).max(900),
   confidence: z.number().min(0).max(1),
@@ -43,7 +56,7 @@ const directorOutputSchema = z.object({
   rejections: z
     .array(
       z.object({
-        candidateKey: z.string().min(1).max(80),
+        candidateKey: candidateKeySchema,
         reason: z.string().min(10).max(500),
       }),
     )

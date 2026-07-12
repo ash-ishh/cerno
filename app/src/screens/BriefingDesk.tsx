@@ -2,13 +2,12 @@ import { useEffect, useMemo, useState } from "react";
 import { useQuery } from "convex/react";
 import { api } from "../../convex/_generated/api";
 import { ArrowRight, BookOpen, CheckCircle2, Database, FileCheck2, Plus, Search, Sparkles } from "lucide-react";
-import { WORKSPACE_KEY } from "../lib/config";
 import { compactId, formatDate } from "../lib/format";
 import { navigate } from "../lib/routes";
 import { EmptyState, LoadingState, Metric, Status } from "../components/UI";
 
 export default function BriefingDesk() {
-  const briefings = useQuery(api.briefings.list, { workspaceKey: WORKSPACE_KEY });
+  const briefings = useQuery(api.briefings.list, {});
   const [selectedId, setSelectedId] = useState<string>();
   const [filter, setFilter] = useState<"all" | "published" | "reviewed">("all");
   const [search, setSearch] = useState("");

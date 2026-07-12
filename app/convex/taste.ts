@@ -1,6 +1,7 @@
 import { mutation, query, type MutationCtx, type QueryCtx } from "./_generated/server";
 import type { Id } from "./_generated/dataModel";
 import { v } from "convex/values";
+import { requireWorkspace } from "./auth";
 
 async function latestApproved(
   ctx: Pick<QueryCtx, "db"> | Pick<MutationCtx, "db">,
@@ -16,13 +17,9 @@ async function latestApproved(
 }
 
 export const current = query({
-  args: { workspaceKey: v.string() },
-  handler: async (ctx, { workspaceKey }) => {
-    const workspace = await ctx.db
-      .query("workspaces")
-      .withIndex("by_key", (q) => q.eq("key", workspaceKey))
-      .unique();
-    if (!workspace) return null;
+  args: {},
+  handler: async (ctx) => {
+    const { workspace } = await requireWorkspace(ctx);
     const currentVersion = await latestApproved(ctx, workspace._id);
     const proposals = await ctx.db
       .query("tasteChangeProposals")
@@ -36,13 +33,9 @@ export const current = query({
 });
 
 export const saveManual = mutation({
-  args: { workspaceKey: v.string(), markdown: v.string() },
-  handler: async (ctx, { workspaceKey, markdown }) => {
-    const workspace = await ctx.db
-      .query("workspaces")
-      .withIndex("by_key", (q) => q.eq("key", workspaceKey))
-      .unique();
-    if (!workspace) throw new Error("Workspace not found.");
+  args: { markdown: v.string() },
+  handler: async (ctx, { markdown }) => {
+    const { workspace } = await requireWorkspace(ctx);
     const currentVersion = await latestApproved(ctx, workspace._id);
     if (!currentVersion) throw new Error("No current TasteDoc.");
     const versionId = await ctx.db.insert("tasteDocVersions", {
@@ -61,19 +54,25 @@ export const saveManual = mutation({
 
 export const recordFeedback = mutation({
   args: {
-    workspaceKey: v.string(),
     briefingId: v.id("briefings"),
     judgmentId: v.id("judgments"),
     reason: v.string(),
     note: v.string(),
   },
   handler: async (ctx, args) => {
-    const workspace = await ctx.db
-      .query("workspaces")
-      .withIndex("by_key", (q) => q.eq("key", args.workspaceKey))
-      .unique();
-    const briefing = await ctx.db.get(args.briefingId);
-    if (!workspace || !briefing) throw new Error("Feedback target not found.");
+    const { workspace } = await requireWorkspace(ctx);
+    const [briefing, judgment] = await Promise.all([
+      ctx.db.get(args.briefingId),
+      ctx.db.get(args.judgmentId),
+    ]);
+    if (!briefing || briefing.workspaceId !== workspace._id || !judgment || judgment.runId !== briefing.runId) {
+      throw new Error("Feedback target not found.");
+    }
+    const section = await ctx.db
+      .query("briefingSections")
+      .withIndex("by_judgment", (q) => q.eq("judgmentId", args.judgmentId))
+      .first();
+    if (!section || section.briefingId !== briefing._id) throw new Error("Feedback target not found.");
     const focusOnly = args.reason === "Relevant, but not right now";
     const feedbackEventId = await ctx.db.insert("feedbackEvents", {
       workspaceId: workspace._id,
@@ -147,8 +146,9 @@ export const resolveProposal = mutation({
     editedRule: v.optional(v.string()),
   },
   handler: async (ctx, { proposalId, decision, editedRule }) => {
+    const { workspace } = await requireWorkspace(ctx);
     const proposal = await ctx.db.get(proposalId);
-    if (!proposal) throw new Error("Taste proposal not found.");
+    if (!proposal || proposal.workspaceId !== workspace._id) throw new Error("Taste proposal not found.");
     if (proposal.status !== "pending") return proposal.resultingVersionId ?? null;
     if (decision === "rejected") {
       await ctx.db.patch(proposalId, { status: "rejected", resolvedAt: Date.now() });

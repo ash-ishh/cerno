@@ -4,12 +4,11 @@ import { api } from "../../convex/_generated/api";
 import type { Id } from "../../convex/_generated/dataModel";
 import { ArrowRight, BookOpen, Clock3, FileText, ListTree, Plus, RefreshCw, Search, Target } from "lucide-react";
 import { EmptyState, LoadingState, Status } from "../components/UI";
-import { WORKSPACE_KEY } from "../lib/config";
 import { compactId, formatDate, sentenceCase } from "../lib/format";
 import { navigate } from "../lib/routes";
 
 export default function FocusThreads({ initialId }: { initialId?: string }) {
-  const threads = useQuery(api.focusThreads.list, { workspaceKey: WORKSPACE_KEY });
+  const threads = useQuery(api.focusThreads.list, {});
   const rerun = useMutation(api.focusThreads.rerun);
   const [selectedId, setSelectedId] = useState<string | undefined>(initialId);
   const [filter, setFilter] = useState<"all" | "active" | "paused">("all");

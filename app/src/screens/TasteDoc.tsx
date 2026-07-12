@@ -4,11 +4,10 @@ import { api } from "../../convex/_generated/api";
 import type { Id } from "../../convex/_generated/dataModel";
 import { ArrowRight, Check, FileDiff, History, PenLine, Save, ShieldCheck, Sparkles, X } from "lucide-react";
 import { LoadingState, Status } from "../components/UI";
-import { WORKSPACE_KEY } from "../lib/config";
 import { formatDate } from "../lib/format";
 
 export default function TasteDoc() {
-  const data = useQuery(api.taste.current, { workspaceKey: WORKSPACE_KEY });
+  const data = useQuery(api.taste.current, {});
   const saveManual = useMutation(api.taste.saveManual);
   const resolve = useMutation(api.taste.resolveProposal);
   const [markdown, setMarkdown] = useState("");
@@ -35,7 +34,7 @@ export default function TasteDoc() {
 
   async function saveDocument() {
     setSaving(true);
-    await saveManual({ workspaceKey: WORKSPACE_KEY, markdown });
+    await saveManual({ markdown });
     setNotice("A new approved TasteDoc version was created.");
     setSaving(false);
   }

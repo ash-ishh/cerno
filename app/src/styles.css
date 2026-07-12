@@ -120,6 +120,18 @@ a { color: inherit; }
 .boot-screen.error p { max-width: 600px; }
 .spin { animation: spin .9s linear infinite; }
 
+/* Authentication */
+.auth-screen { display: grid; min-height: 100vh; padding: 28px; place-items: center; background: radial-gradient(circle at 50% 15%, #e2f1ed 0, var(--canvas) 42%, #edf2ef 100%); }
+.auth-card { display: grid; width: min(420px, 100%); padding: 40px; gap: 16px; border: 1px solid var(--line); border-radius: 18px; background: rgba(255, 254, 251, .96); box-shadow: 0 24px 70px rgba(22, 41, 35, .1); }
+.auth-brand { display: flex; align-items: flex-start; margin-bottom: 15px; gap: 13px; }
+.auth-brand > span { display: grid; gap: 8px; }
+.auth-brand strong { font-size: 1rem; letter-spacing: .16em; }
+.auth-brand small { color: var(--muted); font-family: var(--mono); font-size: .55rem; letter-spacing: .05em; }
+.auth-card h1 { margin: 4px 0 0; font-family: var(--serif); font-size: 2.15rem; line-height: 1.05; }
+.auth-card > p { margin: 0 0 4px; color: var(--muted); font-family: var(--serif); font-size: 1rem; line-height: 1.5; }
+.auth-button { width: 100%; margin-top: 4px; }
+.signed-in-user { max-width: 180px; overflow: hidden; color: var(--muted); font-family: var(--mono); font-size: .55rem; text-overflow: ellipsis; white-space: nowrap; }
+
 /* New Focus */
 .focus-paper { padding-bottom: 24px; }
 .focus-paper form { margin-top: 27px; }
@@ -356,6 +368,11 @@ textarea { padding: 12px; resize: vertical; font-size: .78rem; line-height: 1.5;
 .citation strong { font-size: .62rem; }
 .citation small { color: var(--muted); font-size: .53rem; }
 .citation a { display: inline-flex; align-items: center; width: max-content; margin-top: 4px; gap: 5px; color: var(--green); font-size: .56rem; font-weight: 700; }
+.video-moment { display: flex; align-items: center; gap: 9px; margin-top: 12px; padding: 10px 11px; border: 1px solid #bfd0c2; background: #edf4ef; color: var(--green); text-decoration: none; }
+.video-moment span { display: grid; flex: 1; gap: 2px; }
+.video-moment strong { font-size: .59rem; }
+.video-moment small { color: var(--muted); font-size: .5rem; line-height: 1.35; }
+.video-moment:hover { border-color: var(--green); background: #e4efe7; }
 .evidence-section > p { color: var(--muted); font-size: .66rem; line-height: 1.55; }
 .why-now { padding: 12px; border-radius: 8px; background: #eff8f5; }
 .why-now strong { color: var(--green); font-size: .51rem; }
@@ -522,8 +539,12 @@ textarea { padding: 12px; resize: vertical; font-size: .78rem; line-height: 1.5;
   .primary-nav { display: grid; grid-template-columns: repeat(4, 1fr); margin: 0; gap: 3px; }
   .primary-nav button { min-height: 45px; }
   .topbar { height: 72px; padding: 0 14px; }
-  .topbar-actions .secondary { display: none; }
+  .topbar-actions .focus-shortcut, .signed-in-user, .sign-out span { display: none; }
+  .topbar-actions .sign-out { display: inline-flex; }
   .topbar-actions .button { min-height: 36px; padding: 0 11px; }
+  .auth-screen { padding: 14px; }
+  .auth-card { padding: 30px 24px; }
+  .auth-card h1 { font-size: 1.9rem; }
   .screen-wrap { padding: 12px 10px 84px; }
   .paper, .side-panel, .evidence-panel { padding: 22px 18px; }
   .screen-heading, .desk-heading, .run-heading, .briefing-heading { flex-direction: column; }

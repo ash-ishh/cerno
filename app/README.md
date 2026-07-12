@@ -1,6 +1,6 @@
 # Cerno application
 
-The production-path Cerno application built from the approved Evidence Desk mocks. Unlike `prototype/`, this app has a canonical Convex data model and executes live research through LinkUp and Hermes.
+The production-path Cerno application built from the approved Evidence Desk mocks. Unlike `prototype/`, this app has a canonical Convex data model and executes live research through LinkUp, VideoDB, and Hermes.
 
 ## Verified live path
 
@@ -9,6 +9,7 @@ Focus Thread
   → Convex ResearchRun + immutable context snapshot
   → LinkUp live discovery
   → LinkUp full primary-source fetch
+  → VideoDB upload, spoken-word index, semantic moment search
   → Hermes Research Director
   → native delegate_task specialists
   → deterministic exact-quote validation
@@ -17,7 +18,7 @@ Focus Thread
   → reviewed TasteDoc version
 ```
 
-The browser never receives LinkUp or Hermes credentials. Search snippets are retained only as candidate metadata; every published claim points to a fetched source chunk, exact quote, locator, and SHA-256 hash.
+The browser never receives LinkUp, VideoDB, or Hermes credentials. Search snippets are retained only as candidate metadata; every published claim points to a fetched source chunk, exact quote, locator, and SHA-256 hash. Video findings additionally require a timestamped VideoDB transcript match and playable moment stream.
 
 ## Local development
 
@@ -37,13 +38,16 @@ npx convex env set HERMES_API_KEY '<key>'
 npx convex env set HERMES_URL 'https://your-hermes-host.example.com'
 ```
 
-When the VideoDB lane is enabled, its key belongs in the same server-side Convex environment—not in `.env.local` or a `VITE_*` variable:
+The VideoDB SDK convention is `VIDEO_DB_API_KEY`. If it is already in the repository root `.env`, copy it into the active Convex server environment without printing it or placing it in browser configuration:
 
 ```bash
-npx convex env set VIDEODB_API_KEY '<key>'
+cd app
+set -a; source ../.env; set +a
+printf '%s' "$VIDEO_DB_API_KEY" | npx convex env set VIDEO_DB_API_KEY
+unset VIDEO_DB_API_KEY
 ```
 
-The current code does not consume `VIDEODB_API_KEY` yet; setting it prepares the secret boundary but does not by itself enable video processing.
+For a linked production deployment, authenticate the Convex CLI and add `--prod` to the `convex env set` command. Never use `.env.local` or a `VITE_*` variable for this secret.
 
 Then run both Convex and Vite:
 
@@ -65,15 +69,15 @@ npm run build
 
 ## Canonical collections
 
-`convex/schema.ts` defines workspaces, Focus Threads, TasteDoc versions, research runs, agent steps, run events, candidates, source chunks, claims, judgments, briefings, briefing sections, feedback events, TasteDoc proposals, and the personal index.
+`convex/schema.ts` defines workspaces, Focus Threads, TasteDoc versions, research runs, agent steps, run events, candidates, reusable VideoDB assets, source chunks, claims, judgments, briefings, briefing sections, feedback events, TasteDoc proposals, and the personal index.
 
 ## Current product boundaries
 
-- Live web and paper discovery/fetch are connected through LinkUp.
+- Live web, paper, and long-form video discovery begin through LinkUp.
+- One selected video per run is uploaded to VideoDB, spoken-word indexed, searched semantically, and exposed as exact timestamped transcript evidence with a playable stream.
 - Hermes is bearer-protected on Azure and exposes only `delegation` and `todo` to API runs.
-- Long-form video is visibly unavailable until VideoDB credentials and the video evidence lane are connected.
-- The current buildathon workspace is single-user and intentionally has no authentication. Add identity before opening mutations to a general public audience.
-- The checked-in app is configured against a local anonymous Convex deployment. Public deployment requires linking `app/` to a Convex cloud project and deploying the Vite build.
+- Firebase Google sign-in is wired to Convex token verification, and every public query/mutation resolves an identity-owned workspace. `AUTH_DISABLED` is limited to local development.
+- The current app still runs against a local anonymous Convex deployment. Public deployment requires linking `app/` to Convex cloud, configuring Firebase’s authorized domain, and deploying the Vite build.
 
 ## Prototype boundary
 

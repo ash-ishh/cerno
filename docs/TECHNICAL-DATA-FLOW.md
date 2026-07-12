@@ -10,11 +10,12 @@
 - `app/` is the production-path React/Vite application backed by a complete Convex schema.
 - Focus Threads, immutable run snapshots, candidates, fetched source chunks, claims, judgments, briefings, feedback, and TasteDoc versions persist in Convex and update the UI through subscriptions.
 - A scheduled Convex action uses LinkUp for live discovery and full primary-source fetches. Search snippets remain metadata only.
-- The action submits fetched source excerpts and personal context to the restricted Azure-hosted Hermes Runs API. Hermes performs Director-led native `delegate_task` review; its run ID, usage, and delegation event are persisted.
+- When the video lane is selected, the action sends at most one discovered long-form video to VideoDB, reuses its persisted asset ID, builds a spoken-word index, searches relevant moments, and retrieves timestamped transcript segments plus playable stream links.
+- The action submits fetched source excerpts, VideoDB transcript moments, and personal context to the restricted Azure-hosted Hermes Runs API. Hermes performs Director-led native `delegate_task` review; its run ID, usage, and delegation event are persisted.
 - Deterministic publication code exact-matches every evidence quote, builds a locator and content hash, and refuses to publish fewer than three validated findings when three sources are available.
 - Structured feedback creates either Focus Thread context or a reviewable TasteDoc proposal. Approval creates a new immutable TasteDoc version.
-- The current Convex deployment is local and anonymous; cloud deployment and authentication are not configured.
-- VideoDB and the project-local Hermes Cerno plugin remain unimplemented. The live vertical slice uses a deterministic Convex pre/post-processing bridge around Hermes rather than agent database tools.
+- The current Convex deployment is local and anonymous with an explicit development-only auth bypass. Firebase Google sign-in, Convex token verification, and identity-owned workspace checks are implemented for deployment.
+- The VideoDB evidence lane is implemented through the deterministic Convex bridge. The project-local Hermes Cerno plugin remains unimplemented; Hermes never receives database or unrestricted source tools.
 
 ### Target MVP
 
@@ -276,7 +277,7 @@ A correction never silently retrains or mutates an opaque user model. Durable ta
 4. **Run bridge** — Convex action starts Hermes, stores `hermes_run_id`, receives/polls events, and supports stop/retry.
 5. **Real briefing UI** — replace fixture data with Convex queries/subscriptions; expose citations and rejections.
 6. **Personal index retrieval** — accepted claims plus vector similarity for novelty/redundancy.
-7. **Video lane** — VideoDB asset/transcript search, exact moments, and clip references.
+7. **Video lane — implemented** — VideoDB asset reuse, spoken-word indexing, semantic transcript search, exact moments, and playable stream references.
 8. **Feedback loop** — immutable correction, proposed TasteDoc diff, approval, versioning, and re-score.
 9. **Evaluation suite** — repeated runs checking rank quality, duplicate rejection, citation validity, and timestamp correctness.
 

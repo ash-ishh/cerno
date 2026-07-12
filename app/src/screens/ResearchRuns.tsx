@@ -2,12 +2,11 @@ import { useQuery } from "convex/react";
 import { api } from "../../convex/_generated/api";
 import { ArrowRight, CheckCircle2, CircleDashed, ListTree, Plus, ShieldAlert } from "lucide-react";
 import { EmptyState, LoadingState, Status } from "../components/UI";
-import { WORKSPACE_KEY } from "../lib/config";
 import { compactId, duration, formatDate, sentenceCase } from "../lib/format";
 import { navigate } from "../lib/routes";
 
 export default function ResearchRuns() {
-  const runs = useQuery(api.research.list, { workspaceKey: WORKSPACE_KEY });
+  const runs = useQuery(api.research.list, {});
   if (runs === undefined) return <LoadingState label="Opening research run ledger…" />;
   if (runs.length === 0) return <section className="paper empty-paper"><EmptyState eyebrow="RESEARCH RUNS · VERIFIABLE EXECUTION" title="No hidden agent work." copy="Every live run will retain its Director plan, specialist steps, source candidates, exceptions, Hermes correlation ID, and publication result." action="Create a Focus Thread" onAction={() => navigate("new-focus")} /></section>;
 

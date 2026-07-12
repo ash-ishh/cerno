@@ -221,10 +221,16 @@ Cerno exists to help you consume less, understand more, and preserve the knowled
 
 ## Running implementation
 
-The production-path application now lives in [`app/`](app/). It uses Convex as canonical product memory, LinkUp for live discovery and full source fetches, and the restricted Azure-hosted Hermes runtime for Director-led specialist delegation. The verified local flow publishes three claims only after each quote is matched to fetched primary-source text, then turns explicit feedback into a reviewed TasteDoc version. IDs, usage, evidence hashes, and the honesty boundary are recorded in [`docs/LIVE-VERIFICATION.md`](docs/LIVE-VERIFICATION.md).
+The production-path application now lives in [`app/`](app/). It uses Convex as canonical product memory, LinkUp for live discovery and full source fetches, VideoDB for exact timestamped spoken-word evidence, and the restricted Azure-hosted Hermes runtime for Director-led specialist delegation. The verified local flows publish only after each quote is matched to fetched primary-source text or one exact VideoDB transcript segment, then turn explicit feedback into a reviewed TasteDoc version. IDs, usage, evidence hashes, and the honesty boundary are recorded in [`docs/LIVE-VERIFICATION.md`](docs/LIVE-VERIFICATION.md).
 
 The earlier [`prototype/`](prototype/) remains a fixture-only design artifact and is not imported by the application.
 
+## Demo and presentation
+
+- Public presentation: [cerno-buildathon.pages.dev](https://cerno-buildathon.pages.dev)
+- Editable deck: [`presentation/output/Cerno-Hackathon-Presentation.pptx`](presentation/output/Cerno-Hackathon-Presentation.pptx)
+- Timed pitch and Q&A: [`presentation/PITCH-SCRIPT.md`](presentation/PITCH-SCRIPT.md)
+
 ## Status
 
-The complete single-user workflow runs locally against live services. LinkUp discovers sources, VideoDB resolves one selected long-form video into timestamped transcript evidence and a playable moment, and Hermes delegates review. Public deployment still requires connecting `app/` to a Convex cloud project; authentication remains outside the current cut.
+The complete workflow runs locally against live services. LinkUp discovers sources, VideoDB resolves one selected long-form video into timestamped transcript evidence and a playable moment, and Hermes delegates review. Firebase Google authentication and per-identity workspace isolation are implemented; public deployment still requires linking a Convex cloud project and configuring the production Firebase domain.

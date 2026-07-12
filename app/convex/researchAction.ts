@@ -7,6 +7,12 @@ import { LinkupClient, type TextSearchResult } from "linkup-sdk";
 import { z } from "zod";
 import { createHash } from "node:crypto";
 import type { Id } from "./_generated/dataModel";
+import {
+  VideoDbClient,
+  playerUrl as videoDbPlayerUrl,
+  type VideoDbShot,
+  type VideoDbTranscriptSegment,
+} from "./lib/videoDb";
 
 const HERMES_DEFAULT_URL = "https://cerno-hermes-74d2dc62.eastus.cloudapp.azure.com";
 
@@ -33,11 +39,11 @@ const findingSchema = z.object({
 const directorOutputSchema = z.object({
   title: z.string().min(10).max(140),
   summary: z.string().min(30).max(1000),
-  findings: z.array(findingSchema).min(1).max(5),
+  findings: z.array(findingSchema).max(5),
   rejections: z
     .array(
       z.object({
-        candidateKey: z.string().regex(/^C\d+$/),
+        candidateKey: z.string().min(1).max(80),
         reason: z.string().min(10).max(500),
       }),
     )
@@ -45,6 +51,11 @@ const directorOutputSchema = z.object({
 });
 
 type DirectorOutput = z.infer<typeof directorOutputSchema>;
+type VideoSegment = VideoDbTranscriptSegment & {
+  streamUrl?: string;
+  playerUrl?: string;
+};
+
 type FetchedCandidate = {
   key: string;
   id: Id<"candidates">;
@@ -52,6 +63,23 @@ type FetchedCandidate = {
   url: string;
   sourceName: string;
   markdown: string;
+  kind: "web" | "video";
+  video?: {
+    id: string;
+    lengthSeconds: number;
+    segments: VideoSegment[];
+    streamUrl?: string;
+    playerUrl?: string;
+  };
+};
+
+type FetchedSource = Omit<FetchedCandidate, "key">;
+
+type CandidateSeed = {
+  result: TextSearchResult;
+  contentType: "web" | "paper" | "video";
+  discoveredBy: string;
+  candidateId?: Id<"candidates">;
 };
 
 type HermesStatus = {
@@ -68,7 +96,9 @@ type ResearchContext = {
       outcome: string;
       assignment: string;
       knownContext: string;
+      sourceScope: string[];
       freshness: string;
+      briefingSize: string;
       serendipity: number;
     };
   };
@@ -138,6 +168,16 @@ function recoverExactQuote(markdown: string, quote: string) {
   return markdown.slice(start, end + 1);
 }
 
+function timestamp(seconds: number) {
+  const total = Math.max(0, Math.floor(seconds));
+  const hours = Math.floor(total / 3600);
+  const minutes = Math.floor((total % 3600) / 60);
+  const remainder = total % 60;
+  return hours > 0
+    ? `${hours}:${String(minutes).padStart(2, "0")}:${String(remainder).padStart(2, "0")}`
+    : `${minutes}:${String(remainder).padStart(2, "0")}`;
+}
+
 function sourceChunk(markdown: string, quote: string) {
   const offset = markdown.indexOf(quote);
   if (offset < 0) return null;
@@ -155,6 +195,33 @@ function sourceChunk(markdown: string, quote: string) {
   };
 }
 
+function videoSourceChunk(source: FetchedCandidate, requestedQuote: string) {
+  if (!source.video) return null;
+  for (let index = 0; index < source.video.segments.length; index += 1) {
+    const segment = source.video.segments[index];
+    const exactQuote = segment.text.includes(requestedQuote)
+      ? requestedQuote
+      : recoverExactQuote(segment.text, requestedQuote);
+    if (!exactQuote) continue;
+    const surrounding = source.video.segments.slice(Math.max(0, index - 1), index + 2);
+    const chunk = surrounding
+      .map((item) => `[${timestamp(item.start)}–${timestamp(item.end)}] ${item.text}`)
+      .join("\n")
+      .trim();
+    return {
+      exactQuote,
+      chunk,
+      locator: `VideoDB spoken-word transcript · ${timestamp(segment.start)}–${timestamp(segment.end)}`,
+      hash: createHash("sha256").update(chunk).digest("hex"),
+      startSeconds: segment.start,
+      endSeconds: segment.end,
+      streamUrl: segment.streamUrl,
+      playerUrl: segment.playerUrl,
+    };
+  }
+  return null;
+}
+
 function parseJsonOutput(raw: string): DirectorOutput {
   const withoutFence = raw.trim().replace(/^```(?:json)?\s*/i, "").replace(/\s*```$/, "");
   const firstBrace = withoutFence.indexOf("{");
@@ -168,18 +235,26 @@ function buildDirectorPrompt(
   sources: FetchedCandidate[],
 ) {
   const sourceBlock = sources
-    .map(
-      (source) => `\n<source id="${source.key}" title="${source.title.replaceAll('"', "'")}" url="${source.url}">\n${source.markdown}\n</source>`,
-    )
+    .map((source) => {
+      if (source.kind === "video" && source.video) {
+        const transcript = source.video.segments
+          .map((segment) => `[${timestamp(segment.start)}–${timestamp(segment.end)}] ${segment.text}`)
+          .join("\n");
+        return `\n<source id="${source.key}" type="videodb_transcript" videodb_id="${source.video.id}" title="${source.title.replaceAll('"', "'")}" url="${source.url}">\n${transcript}\n</source>`;
+      }
+      return `\n<source id="${source.key}" type="primary_text" title="${source.title.replaceAll('"', "'")}" url="${source.url}">\n${source.markdown}\n</source>`;
+    })
     .join("\n");
   const archive = context.archive
     .map((entry) => `- ${entry.title}: ${entry.claimText}`)
     .join("\n");
-  const target = Math.min(3, sources.length);
+  const target = Math.min(Number.parseInt(context.run.focusSnapshot.briefingSize, 10) || 3, sources.length);
+  const videoKeys = sources.filter((source) => source.kind === "video").map((source) => source.key);
+  const textKeys = sources.filter((source) => source.kind === "web").map((source) => source.key);
 
   return `Execute one bounded Cerno research review. Use delegate_task once with exactly three parallel specialists:
-1) Evidence Analyst A: inspect sources ${sources.filter((_, index) => index % 2 === 0).map((item) => item.key).join(", ")}.
-2) Evidence Analyst B: inspect sources ${sources.filter((_, index) => index % 2 === 1).map((item) => item.key).join(", ")}.
+1) Evidence Analyst: inspect primary-text sources ${textKeys.join(", ") || "none; cross-check the transcript evidence instead"}.
+2) ${videoKeys.length ? `Video Analyst: inspect VideoDB transcript sources ${videoKeys.join(", ")} and identify exact timestamped moments` : `Evidence Analyst B: independently inspect sources ${sources.filter((_, index) => index % 2 === 1).map((item) => item.key).join(", ")}`}.
 3) Personal Editor: compare the candidate set with the TasteDoc, Focus Thread, and personal archive below.
 After all three return, act as Research Director: select exactly ${target} strongest non-redundant findings, check every quote, title the briefing from accepted evidence, and reject the remaining candidates.
 
@@ -203,6 +278,7 @@ ${sourceBlock}
 PUBLICATION CONTRACT
 - Search metadata is not evidence. Use only text inside the <source> blocks.
 - evidenceQuote must be one exact, contiguous substring copied character-for-character from that source. Do not remove markdown markers, alter punctuation, or use ellipses.
+- For a videodb_transcript source, copy only spoken text from inside one timestamped line; do not include the [start–end] prefix. Use section exact_moment.
 - A claim must not exceed what its exact quote supports.
 - Prefer primary evidence, measurements, operational detail, and material that changes a decision.
 - Mark novelty relative to the personal archive; do not present an archive item as fresh evidence.
@@ -274,112 +350,266 @@ export const execute = internalAction({
         parentStepId: directorStep!,
         role: "Scout",
         label: "Discover and triage candidates",
-        assignment: "Search live web and papers; preserve snippets as discovery metadata only.",
+        assignment: "Search selected live lanes; preserve snippets as discovery metadata and route one video through VideoDB when requested.",
         status: "running",
         order: 2,
       });
 
+      const sourceScope = context.run.focusSnapshot.sourceScope;
+      const wantsVideo = sourceScope.includes("Long-form video");
+      const wantsText = sourceScope.includes("Live web") || sourceScope.includes("Research papers");
       const query = `${context.run.focusSnapshot.assignment}. Current work: ${context.run.focusSnapshot.currentWork}. Desired outcome: ${context.run.focusSnapshot.outcome}. Find recent primary sources, technical reports, research papers, or first-party engineering evidence. ${context.run.focusSnapshot.knownContext ? `Avoid repeating: ${context.run.focusSnapshot.knownContext}` : ""}`;
       const fromDate = freshnessStart(context.run.focusSnapshot.freshness);
-      const searchResponse = await linkup.search({
-        query,
-        depth: "standard",
-        outputType: "searchResults",
-        maxResults: 7,
-        ...(fromDate ? { fromDate } : {}),
-      });
-      const textResults = searchResponse.results
+      const searches = await Promise.allSettled([
+        wantsText
+          ? linkup.search({
+              query,
+              depth: "standard",
+              outputType: "searchResults",
+              maxResults: wantsVideo ? 5 : 7,
+              ...(fromDate ? { fromDate } : {}),
+            })
+          : Promise.resolve(null),
+        wantsVideo
+          ? linkup.search({
+              query: `${context.run.focusSnapshot.assignment}. Find a substantive long-form conference talk, technical interview, or first-party presentation with spoken evidence. site:youtube.com`,
+              depth: "standard",
+              outputType: "searchResults",
+              maxResults: 3,
+              ...(fromDate ? { fromDate } : {}),
+            })
+          : Promise.resolve(null),
+      ]);
+      const baseResponse = searches[0].status === "fulfilled" ? searches[0].value : null;
+      const videoResponse = searches[1].status === "fulfilled" ? searches[1].value : null;
+      const baseSeeds: CandidateSeed[] = (baseResponse?.results ?? [])
         .filter((item): item is TextSearchResult => item.type === "text")
-        .filter((item, index, all) => all.findIndex((other) => other.url === item.url) === index)
+        .filter((item) => wantsVideo || contentType(item.url) !== "video")
+        .map((result) => ({
+          result,
+          contentType: contentType(result.url),
+          discoveredBy: "LinkUp live search",
+        }));
+      const videoSeeds: CandidateSeed[] = (videoResponse?.results ?? [])
+        .filter((item): item is TextSearchResult => item.type === "text" && contentType(item.url) === "video")
+        .map((result) => ({
+          result,
+          contentType: "video",
+          discoveredBy: "LinkUp video discovery → VideoDB",
+        }));
+      const seeds = [...baseSeeds, ...videoSeeds]
+        .filter((seed, index, all) => all.findIndex((other) => other.result.url === seed.result.url) === index)
         .slice(0, 7);
-      if (textResults.length === 0) throw new Error("LinkUp returned no text candidates for this research contract.");
+      if (seeds.length === 0) throw new Error("LinkUp returned no candidates for this research contract.");
 
       const candidateIds = await ctx.runMutation(internal.research.saveCandidates, {
         runId,
-        candidates: textResults.map((item) => ({
-          url: item.url,
-          title: item.name,
-          sourceName: hostName(item.url),
-          description: item.content.slice(0, 500),
-          contentType: contentType(item.url),
+        candidates: seeds.map((seed) => ({
+          url: seed.result.url,
+          title: seed.result.name,
+          sourceName: hostName(seed.result.url),
+          description: seed.result.content.slice(0, 500),
+          contentType: seed.contentType,
+          discoveredBy: seed.discoveredBy,
         })),
       });
+      seeds.forEach((seed, index) => { seed.candidateId = candidateIds[index]; });
       await ctx.runMutation(internal.research.updateStep, {
         stepId: scoutStep!,
         status: "complete",
-        summary: `${textResults.length} candidates discovered; snippets retained only as discovery metadata.`,
-        toolCalls: 1,
+        summary: `${seeds.length} candidates discovered${videoSeeds.length ? `, including ${videoSeeds.length} video candidate${videoSeeds.length === 1 ? "" : "s"}` : ""}; snippets retained only as discovery metadata.`,
+        toolCalls: wantsVideo ? 2 : 1,
       });
       await ctx.runMutation(internal.research.addEvent, {
         runId,
         type: "discovery.complete",
-        label: `${textResults.length} live candidates discovered`,
-        detail: "Cerno will fetch selected primary pages before any claim can be published.",
+        label: `${seeds.length} live candidates discovered`,
+        detail: wantsVideo
+          ? "Cerno will fetch selected pages and ask VideoDB for one timestamped spoken-word evidence lane."
+          : "Cerno will fetch selected primary pages before any claim can be published.",
       });
 
       await ctx.runMutation(internal.research.updateRun, {
         runId,
         status: "analyzing",
-        phase: "Fetching selected sources beyond search snippets",
+        phase: wantsVideo ? "Fetching primary text and indexing one VideoDB source" : "Fetching selected sources beyond search snippets",
       });
-      const selected = textResults.slice(0, 4);
+      const selectedSeeds = [
+        ...seeds.filter((seed) => seed.contentType !== "video").slice(0, wantsVideo ? 3 : 4),
+        ...seeds.filter((seed) => seed.contentType === "video").slice(0, wantsVideo ? 1 : 0),
+      ];
+      const videoDbKey = process.env.VIDEO_DB_API_KEY || process.env.VIDEODB_API_KEY;
+      const videoDb = videoDbKey ? new VideoDbClient(videoDbKey) : null;
       const fetchedSettled = await Promise.allSettled(
-        selected.map(async (item, index) => {
-          await ctx.runMutation(internal.research.markCandidate, {
-            candidateId: candidateIds[index],
-            status: "selected",
-          });
-          const result = await linkup.fetch({ url: item.url, renderJs: false });
+        selectedSeeds.map(async (seed): Promise<FetchedSource> => {
+          const candidateId = seed.candidateId!;
+          await ctx.runMutation(internal.research.markCandidate, { candidateId, status: "selected" });
+
+          if (seed.contentType === "video") {
+            if (!videoDb) throw new Error("VIDEO_DB_API_KEY is not configured in the Convex environment.");
+            const existing = await ctx.runQuery(internal.research.getVideoAsset, {
+              workspaceId: context.run.workspaceId,
+              sourceUrl: seed.result.url,
+            });
+            let videoId = existing?.videoDbId;
+            let lengthSeconds = existing?.lengthSeconds ?? 0;
+            let streamUrl = existing?.streamUrl;
+            let suppliedPlayerUrl = existing?.playerUrl;
+            let indexed = existing?.status === "indexed";
+
+            if (!videoId || existing?.status === "failed") {
+              const uploaded = await videoDb.uploadUrl(
+                seed.result.url,
+                seed.result.name,
+                `Cerno evidence source for Research Run ${runId}`,
+              );
+              videoId = uploaded.id;
+              lengthSeconds = Number(uploaded.length ?? 0) || 0;
+              streamUrl = uploaded.stream_url;
+              suppliedPlayerUrl = uploaded.player_url;
+              indexed = false;
+              await ctx.runMutation(internal.research.upsertVideoAsset, {
+                workspaceId: context.run.workspaceId,
+                sourceUrl: seed.result.url,
+                videoDbId: videoId,
+                name: seed.result.name,
+                lengthSeconds,
+                streamUrl,
+                playerUrl: videoDbPlayerUrl(streamUrl, suppliedPlayerUrl),
+                status: "uploaded",
+              });
+            }
+            if (!indexed) {
+              await videoDb.indexSpokenWords(videoId);
+              await ctx.runMutation(internal.research.upsertVideoAsset, {
+                workspaceId: context.run.workspaceId,
+                sourceUrl: seed.result.url,
+                videoDbId: videoId,
+                name: seed.result.name,
+                lengthSeconds,
+                streamUrl,
+                playerUrl: videoDbPlayerUrl(streamUrl, suppliedPlayerUrl),
+                status: "indexed",
+              });
+            }
+
+            let shots: VideoDbShot[] = [];
+            try {
+              shots = await videoDb.searchSpokenWords(videoId, context.run.focusSnapshot.assignment);
+            } catch {
+              shots = [];
+            }
+            const transcriptBatches = shots.length
+              ? await Promise.allSettled(
+                  shots.slice(0, 4).map((shot) => videoDb.transcript(videoId!, Math.max(0, shot.start - 2), shot.end + 2)),
+                )
+              : [{ status: "fulfilled" as const, value: await videoDb.transcript(videoId) }];
+            const rawSegments = transcriptBatches.flatMap((batch) => batch.status === "fulfilled" ? batch.value : []);
+            const sourceSegments = (rawSegments.length ? rawSegments : shots.map((shot) => ({ start: shot.start, end: shot.end, text: shot.text })))
+              .sort((a, b) => a.start - b.start)
+              .filter((segment, index, all) => all.findIndex((other) => other.start === segment.start && other.end === segment.end && other.text === segment.text) === index);
+            const segments: VideoSegment[] = [];
+            let transcriptCharacters = 0;
+            for (const segment of sourceSegments) {
+              if (transcriptCharacters + segment.text.length > 10_000) break;
+              const shot = shots.find((item) => segment.start <= item.end && segment.end >= item.start);
+              segments.push({
+                ...segment,
+                streamUrl: shot?.streamUrl,
+                playerUrl: videoDbPlayerUrl(shot?.streamUrl, shot?.playerUrl),
+              });
+              transcriptCharacters += segment.text.length;
+            }
+            if (segments.length === 0 || transcriptCharacters < 200) {
+              throw new Error("VideoDB produced no sufficiently detailed timestamped transcript evidence.");
+            }
+            await ctx.runMutation(internal.research.attachVideoMetadata, {
+              candidateId,
+              videoDbId: videoId,
+              streamUrl,
+              playerUrl: videoDbPlayerUrl(streamUrl, suppliedPlayerUrl),
+              durationSeconds: lengthSeconds,
+            });
+            await ctx.runMutation(internal.research.addEvent, {
+              runId,
+              type: "videodb.indexed",
+              label: "VideoDB evidence lane ready",
+              detail: `${segments.length} timestamped transcript segments were retrieved from ${videoId}; semantic search moments remain linked to playable streams.`,
+            });
+            await ctx.runMutation(internal.research.markCandidate, { candidateId, status: "consumed" });
+            return {
+              id: candidateId,
+              title: seed.result.name,
+              url: seed.result.url,
+              sourceName: hostName(seed.result.url),
+              markdown: segments.map((segment) => segment.text).join("\n\n"),
+              kind: "video",
+              video: {
+                id: videoId,
+                lengthSeconds,
+                segments,
+                streamUrl,
+                playerUrl: videoDbPlayerUrl(streamUrl, suppliedPlayerUrl),
+              },
+            };
+          }
+
+          const result = await linkup.fetch({ url: seed.result.url, renderJs: false });
           const markdown = cleanMarkdown(result.markdown);
           if (markdown.length < 600) throw new Error("Fetched source was too short to support evidence.");
-          await ctx.runMutation(internal.research.markCandidate, {
-            candidateId: candidateIds[index],
-            status: "consumed",
-          });
+          await ctx.runMutation(internal.research.markCandidate, { candidateId, status: "consumed" });
           return {
-            key: `C${index + 1}`,
-            id: candidateIds[index],
-            title: item.name,
-            url: item.url,
-            sourceName: hostName(item.url),
+            id: candidateId,
+            title: seed.result.name,
+            url: seed.result.url,
+            sourceName: hostName(seed.result.url),
             markdown,
-          } satisfies FetchedCandidate;
+            kind: "web",
+          };
         }),
       );
       const fetched: FetchedCandidate[] = [];
       for (let index = 0; index < fetchedSettled.length; index += 1) {
         const result = fetchedSettled[index];
-        if (result.status === "fulfilled") fetched.push(result.value);
+        if (result.status === "fulfilled") fetched.push({ ...result.value, key: `C${fetched.length + 1}` });
         else {
+          const seed = selectedSeeds[index];
           await ctx.runMutation(internal.research.markCandidate, {
-            candidateId: candidateIds[index],
+            candidateId: seed.candidateId!,
             status: "unavailable",
-            rejectionReason: "Primary source fetch failed; search metadata was not used as evidence.",
+            rejectionReason: seed.contentType === "video"
+              ? `VideoDB could not produce timestamped evidence: ${result.reason instanceof Error ? result.reason.message.slice(0, 280) : "unknown failure"}`
+              : "Primary source fetch failed; search metadata was not used as evidence.",
           });
         }
       }
-      if (fetched.length < 2) throw new Error("Fewer than two primary sources could be fetched beyond search snippets.");
+      const requiredSources = wantsText ? 2 : 1;
+      if (fetched.length < requiredSources) throw new Error(`Fewer than ${requiredSources} source${requiredSources === 1 ? "" : "s"} could be consumed as primary evidence.`);
       await ctx.runMutation(internal.research.updateRun, {
         runId,
         consumedCount: fetched.length,
         phase: "Hermes is delegating parallel evidence review",
       });
 
+      const videoSources = fetched.filter((source) => source.kind === "video");
+      const textSources = fetched.filter((source) => source.kind === "web");
       analystAStep = await ctx.runMutation(internal.research.createStep, {
         runId,
         parentStepId: directorStep!,
-        role: "Evidence Analyst A",
+        role: "Evidence Analyst",
         label: "Inspect primary-source evidence",
-        assignment: `Read ${fetched.filter((_, index) => index % 2 === 0).map((item) => item.key).join(", ")} and return exact quotes.`,
+        assignment: `Read ${textSources.map((item) => item.key).join(", ") || fetched.map((item) => item.key).join(", ")} and return exact quotes.`,
         status: "running",
         order: 3,
       });
       analystBStep = await ctx.runMutation(internal.research.createStep, {
         runId,
         parentStepId: directorStep!,
-        role: "Evidence Analyst B",
-        label: "Inspect primary-source evidence",
-        assignment: `Read ${fetched.filter((_, index) => index % 2 === 1).map((item) => item.key).join(", ")} and return exact quotes.`,
+        role: videoSources.length ? "Video Analyst" : "Evidence Analyst B",
+        label: videoSources.length ? "Inspect timestamped VideoDB evidence" : "Inspect primary-source evidence",
+        assignment: videoSources.length
+          ? `Read ${videoSources.map((item) => item.key).join(", ")} and return one exact spoken passage with its VideoDB timestamp.`
+          : `Read ${fetched.filter((_, index) => index % 2 === 1).map((item) => item.key).join(", ")} and return exact quotes.`,
         status: "running",
         order: 4,
       });
@@ -490,7 +720,9 @@ export const execute = internalAction({
         ctx.runMutation(internal.research.updateStep, {
           stepId: analystBStep!,
           status: "complete",
-          summary: "Returned independent source analysis and rejection signals.",
+          summary: videoSources.length
+            ? "Returned timestamped transcript analysis from the VideoDB evidence lane."
+            : "Returned independent source analysis and rejection signals.",
           toolCalls: 1,
         }),
         ctx.runMutation(internal.research.updateStep, {
@@ -527,6 +759,56 @@ export const execute = internalAction({
           failedValidation.push({ key: finding.candidateKey, reason: "Unknown or duplicate candidate reference." });
           continue;
         }
+        if (source.kind === "video") {
+          const videoChunk = videoSourceChunk(source, finding.evidenceQuote);
+          if (!videoChunk || !source.video || !videoDb) {
+            failedValidation.push({ key: finding.candidateKey, reason: "Evidence quote was not an exact substring of one timestamped VideoDB transcript segment." });
+            continue;
+          }
+          let streamUrl = videoChunk.streamUrl;
+          let playableUrl = videoChunk.playerUrl;
+          if (!streamUrl) {
+            try {
+              const stream = await videoDb.momentStream(
+                source.video.id,
+                videoChunk.startSeconds,
+                videoChunk.endSeconds,
+                source.video.lengthSeconds,
+              );
+              streamUrl = stream.stream_url;
+              playableUrl = videoDbPlayerUrl(streamUrl, stream.player_url);
+            } catch {
+              streamUrl = undefined;
+              playableUrl = undefined;
+            }
+          }
+          if (!streamUrl || !playableUrl) {
+            failedValidation.push({ key: finding.candidateKey, reason: "VideoDB transcript matched, but no playable timestamped evidence stream could be generated." });
+            continue;
+          }
+          used.add(finding.candidateKey);
+          validatedFindings.push({
+            candidateId: source.id,
+            claim: finding.claim,
+            evidenceQuote: videoChunk.exactQuote,
+            chunkText: videoChunk.chunk,
+            locator: videoChunk.locator,
+            contentHash: videoChunk.hash,
+            startSeconds: videoChunk.startSeconds,
+            endSeconds: videoChunk.endSeconds,
+            streamUrl,
+            playerUrl: playableUrl,
+            confidence: finding.confidence,
+            section: "exact_moment" as const,
+            explanation: finding.explanation,
+            whyNow: finding.whyNow,
+            tasteRules: finding.tasteRules,
+            attentionMinutes: finding.attentionMinutes,
+            ...finding.scores,
+          });
+          continue;
+        }
+
         const exactQuote = source.markdown.includes(finding.evidenceQuote)
           ? finding.evidenceQuote
           : recoverExactQuote(source.markdown, finding.evidenceQuote);
@@ -552,7 +834,7 @@ export const execute = internalAction({
           ...finding.scores,
         });
       }
-      const minimum = Math.min(3, fetched.length);
+      const minimum = Math.min(Number.parseInt(context.run.focusSnapshot.briefingSize, 10) || 3, fetched.length);
       if (validatedFindings.length < minimum) {
         throw new Error(`${validatedFindings.length}/${minimum} required findings passed exact evidence validation. Unsupported claims were not published.`);
       }

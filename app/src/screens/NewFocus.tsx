@@ -2,14 +2,13 @@ import { useMemo, useState, type FormEvent } from "react";
 import { useMutation } from "convex/react";
 import { api } from "../../convex/_generated/api";
 import { ArrowRight, Check, Database, FileSearch, Globe2, ShieldCheck, Sparkles, Video } from "lucide-react";
-import { WORKSPACE_KEY } from "../lib/config";
 import { navigate } from "../lib/routes";
 
 const scopes = [
   { id: "Live web", label: "Live web", detail: "LinkUp discovery + full page fetch", icon: Globe2, available: true },
   { id: "Research papers", label: "Research papers", detail: "arXiv, DOI, and technical reports", icon: FileSearch, available: true },
   { id: "Personal archive", label: "Personal archive", detail: "Novelty and redundancy comparison", icon: Database, available: true },
-  { id: "Long-form video", label: "Long-form video", detail: "Requires VideoDB connection", icon: Video, available: false },
+  { id: "Long-form video", label: "Long-form video", detail: "VideoDB transcript + playable timestamps", icon: Video, available: true },
 ];
 
 export default function NewFocus() {
@@ -26,13 +25,13 @@ export default function NewFocus() {
     briefingSize: "3 findings",
     serendipity: 15,
   });
-  const [selectedScopes, setSelectedScopes] = useState(["Live web", "Research papers", "Personal archive"]);
+  const [selectedScopes, setSelectedScopes] = useState(["Live web", "Research papers", "Personal archive", "Long-form video"]);
 
   const complete = useMemo(
     () => form.title.trim() && form.currentWork.trim() && form.outcome.trim() && form.assignment.trim(),
     [form],
   );
-  const hasLiveSource = selectedScopes.includes("Live web") || selectedScopes.includes("Research papers");
+  const hasLiveSource = selectedScopes.includes("Live web") || selectedScopes.includes("Research papers") || selectedScopes.includes("Long-form video");
 
   function update(field: keyof typeof form, value: string | number) {
     setForm((current) => ({ ...current, [field]: value }));
@@ -49,7 +48,6 @@ export default function NewFocus() {
     setError("");
     try {
       const result = await createAndRun({
-        workspaceKey: WORKSPACE_KEY,
         ...form,
         title: form.title.trim(),
         currentWork: form.currentWork.trim(),
@@ -151,13 +149,13 @@ export default function NewFocus() {
         <div className="panel-rule" />
         <ol className="contract-steps">
           <li><span>1</span><div><strong>Scout live sources</strong><p>LinkUp returns candidate metadata. No snippet becomes a citation.</p></div></li>
-          <li><span>2</span><div><strong>Consume selectively</strong><p>Cerno fetches full primary pages for only the strongest candidates.</p></div></li>
+          <li><span>2</span><div><strong>Consume selectively</strong><p>Cerno fetches primary pages and asks VideoDB for timestamped transcript moments.</p></div></li>
           <li><span>3</span><div><strong>Delegate judgment</strong><p>Hermes runs parallel Evidence Analysts and a Personal Editor.</p></div></li>
           <li><span>4</span><div><strong>Validate and publish</strong><p>Exact-match evidence checks run before a canonical briefing is written.</p></div></li>
         </ol>
         <div className="panel-rule" />
-        <div className="runtime-proof"><Sparkles size={16} /><div><strong>Real services, no fixture path</strong><p>Convex is canonical memory. LinkUp discovers and fetches. Hermes plans and delegates.</p></div></div>
-        <div className="contract-limit"><code>BOUNDARIES</code><strong>7 discovered · 4 fetched · 3 published</strong><small>One run. One document. No feed.</small></div>
+        <div className="runtime-proof"><Sparkles size={16} /><div><strong>Real services, no fixture path</strong><p>Convex stores provenance. LinkUp discovers. VideoDB resolves moments. Hermes plans and delegates.</p></div></div>
+        <div className="contract-limit"><code>BOUNDARIES</code><strong>7 discovered · 4 consumed · 3 published</strong><small>At most one video lane. One run. One document.</small></div>
       </aside>
     </div>
   );

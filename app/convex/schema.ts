@@ -34,7 +34,10 @@ const focusSnapshot = v.object({
 
 export default defineSchema({
   workspaces: defineTable({
+    // The key is the globally unique identity tokenIdentifier from Convex auth.
     key: v.string(),
+    ownerEmail: v.optional(v.string()),
+    ownerName: v.optional(v.string()),
     name: v.string(),
     createdAt: v.number(),
   }).index("by_key", ["key"]),
@@ -138,6 +141,10 @@ export default defineSchema({
     ),
     rejectionReason: v.optional(v.string()),
     discoveredBy: v.string(),
+    videoDbId: v.optional(v.string()),
+    streamUrl: v.optional(v.string()),
+    playerUrl: v.optional(v.string()),
+    durationSeconds: v.optional(v.number()),
     createdAt: v.number(),
   })
     .index("by_run", ["runId"])
@@ -149,6 +156,10 @@ export default defineSchema({
     text: v.string(),
     locator: v.string(),
     contentHash: v.string(),
+    startSeconds: v.optional(v.number()),
+    endSeconds: v.optional(v.number()),
+    streamUrl: v.optional(v.string()),
+    playerUrl: v.optional(v.string()),
     createdAt: v.number(),
   })
     .index("by_run", ["runId"])
@@ -240,6 +251,20 @@ export default defineSchema({
   })
     .index("by_workspace", ["workspaceId"])
     .index("by_status", ["status"]),
+
+  videoAssets: defineTable({
+    workspaceId: v.id("workspaces"),
+    sourceUrl: v.string(),
+    videoDbId: v.string(),
+    name: v.string(),
+    lengthSeconds: v.number(),
+    streamUrl: v.optional(v.string()),
+    playerUrl: v.optional(v.string()),
+    status: v.union(v.literal("uploaded"), v.literal("indexed"), v.literal("failed")),
+    error: v.optional(v.string()),
+    createdAt: v.number(),
+    updatedAt: v.number(),
+  }).index("by_workspace_source", ["workspaceId", "sourceUrl"]),
 
   personalIndex: defineTable({
     workspaceId: v.id("workspaces"),

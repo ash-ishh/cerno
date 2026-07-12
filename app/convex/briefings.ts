@@ -1,14 +1,11 @@
 import { mutation, query } from "./_generated/server";
 import { v } from "convex/values";
+import { requireWorkspace } from "./auth";
 
 export const list = query({
-  args: { workspaceKey: v.string() },
-  handler: async (ctx, { workspaceKey }) => {
-    const workspace = await ctx.db
-      .query("workspaces")
-      .withIndex("by_key", (q) => q.eq("key", workspaceKey))
-      .unique();
-    if (!workspace) return [];
+  args: {},
+  handler: async (ctx) => {
+    const { workspace } = await requireWorkspace(ctx);
     const briefings = await ctx.db
       .query("briefings")
       .withIndex("by_workspace", (q) => q.eq("workspaceId", workspace._id))
@@ -30,8 +27,9 @@ export const list = query({
 export const get = query({
   args: { briefingId: v.id("briefings") },
   handler: async (ctx, { briefingId }) => {
+    const { workspace } = await requireWorkspace(ctx);
     const briefing = await ctx.db.get(briefingId);
-    if (!briefing) return null;
+    if (!briefing || briefing.workspaceId !== workspace._id) return null;
     const [focus, run, sectionRecords, candidates] = await Promise.all([
       ctx.db.get(briefing.focusThreadId),
       ctx.db.get(briefing.runId),
@@ -74,8 +72,9 @@ export const get = query({
 export const markReviewed = mutation({
   args: { briefingId: v.id("briefings") },
   handler: async (ctx, { briefingId }) => {
+    const { workspace } = await requireWorkspace(ctx);
     const briefing = await ctx.db.get(briefingId);
-    if (!briefing) throw new Error("Briefing not found.");
+    if (!briefing || briefing.workspaceId !== workspace._id) throw new Error("Briefing not found.");
     if (briefing.status === "reviewed") return;
     await ctx.db.patch(briefingId, { status: "reviewed", reviewedAt: Date.now() });
   },

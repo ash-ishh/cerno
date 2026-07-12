@@ -1,19 +1,30 @@
 import { mutation, query } from "./_generated/server";
-import { v } from "convex/values";
+import { currentWorkspace, requireIdentity } from "./auth";
 
 export const ensure = mutation({
-  args: { key: v.string() },
-  handler: async (ctx, { key }) => {
+  args: {},
+  handler: async (ctx) => {
+    const identity = await requireIdentity(ctx);
     const existing = await ctx.db
       .query("workspaces")
-      .withIndex("by_key", (q) => q.eq("key", key))
+      .withIndex("by_key", (q) => q.eq("key", identity.tokenIdentifier))
       .unique();
-    if (existing) return existing._id;
+    if (existing) {
+      if (existing.ownerEmail !== identity.email || existing.ownerName !== identity.name) {
+        await ctx.db.patch(existing._id, {
+          ownerEmail: identity.email,
+          ownerName: identity.name,
+        });
+      }
+      return existing._id;
+    }
 
     const now = Date.now();
     const workspaceId = await ctx.db.insert("workspaces", {
-      key,
-      name: "Personal intelligence desk",
+      key: identity.tokenIdentifier,
+      ownerEmail: identity.email,
+      ownerName: identity.name,
+      name: identity.name ? `${identity.name}’s intelligence desk` : "Personal intelligence desk",
       createdAt: now,
     });
 
@@ -57,11 +68,9 @@ export const ensure = mutation({
 });
 
 export const get = query({
-  args: { key: v.string() },
-  handler: async (ctx, { key }) => {
-    return await ctx.db
-      .query("workspaces")
-      .withIndex("by_key", (q) => q.eq("key", key))
-      .unique();
+  args: {},
+  handler: async (ctx) => {
+    const { workspace } = await currentWorkspace(ctx);
+    return workspace;
   },
 });

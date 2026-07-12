@@ -1,6 +1,7 @@
 import { internalMutation, internalQuery, mutation, query } from "./_generated/server";
 import { internal } from "./_generated/api";
 import { v } from "convex/values";
+import { requireWorkspace } from "./auth";
 
 const runStatus = v.union(
   v.literal("queued"),
@@ -128,6 +129,7 @@ export const saveCandidates = internalMutation({
         sourceName: v.string(),
         description: v.string(),
         contentType: v.union(v.literal("web"), v.literal("paper"), v.literal("video")),
+        discoveredBy: v.string(),
       }),
     ),
   },
@@ -139,13 +141,61 @@ export const saveCandidates = internalMutation({
           runId,
           ...candidate,
           status: "discovered",
-          discoveredBy: "LinkUp live search",
           createdAt: Date.now(),
         }),
       );
     }
     await ctx.db.patch(runId, { candidateCount: ids.length });
     return ids;
+  },
+});
+
+export const attachVideoMetadata = internalMutation({
+  args: {
+    candidateId: v.id("candidates"),
+    videoDbId: v.string(),
+    streamUrl: v.optional(v.string()),
+    playerUrl: v.optional(v.string()),
+    durationSeconds: v.number(),
+  },
+  handler: async (ctx, { candidateId, ...metadata }) => {
+    await ctx.db.patch(candidateId, metadata);
+  },
+});
+
+export const getVideoAsset = internalQuery({
+  args: { workspaceId: v.id("workspaces"), sourceUrl: v.string() },
+  handler: async (ctx, args) => {
+    return await ctx.db
+      .query("videoAssets")
+      .withIndex("by_workspace_source", (q) => q.eq("workspaceId", args.workspaceId).eq("sourceUrl", args.sourceUrl))
+      .unique();
+  },
+});
+
+export const upsertVideoAsset = internalMutation({
+  args: {
+    workspaceId: v.id("workspaces"),
+    sourceUrl: v.string(),
+    videoDbId: v.string(),
+    name: v.string(),
+    lengthSeconds: v.number(),
+    streamUrl: v.optional(v.string()),
+    playerUrl: v.optional(v.string()),
+    status: v.union(v.literal("uploaded"), v.literal("indexed"), v.literal("failed")),
+    error: v.optional(v.string()),
+  },
+  handler: async (ctx, args) => {
+    const existing = await ctx.db
+      .query("videoAssets")
+      .withIndex("by_workspace_source", (q) => q.eq("workspaceId", args.workspaceId).eq("sourceUrl", args.sourceUrl))
+      .unique();
+    const now = Date.now();
+    if (existing) {
+      await ctx.db.patch(existing._id, { ...args, updatedAt: now });
+      return existing._id;
+    }
+    return await ctx.db.insert("videoAssets", { ...args, createdAt: now, updatedAt: now });
   },
 });
 
@@ -174,6 +224,10 @@ const findingValidator = v.object({
   chunkText: v.string(),
   locator: v.string(),
   contentHash: v.string(),
+  startSeconds: v.optional(v.number()),
+  endSeconds: v.optional(v.number()),
+  streamUrl: v.optional(v.string()),
+  playerUrl: v.optional(v.string()),
   confidence: v.number(),
   section: v.union(v.literal("must_know"), v.literal("exact_moment"), v.literal("archive"), v.literal("serendipity")),
   explanation: v.string(),
@@ -236,6 +290,10 @@ export const publish = internalMutation({
         text: finding.chunkText,
         locator: finding.locator,
         contentHash: finding.contentHash,
+        startSeconds: finding.startSeconds,
+        endSeconds: finding.endSeconds,
+        streamUrl: finding.streamUrl,
+        playerUrl: finding.playerUrl,
         createdAt: Date.now(),
       });
       const claimId = await ctx.db.insert("claims", {
@@ -246,7 +304,9 @@ export const publish = internalMutation({
         evidenceQuote: finding.evidenceQuote,
         confidence: finding.confidence,
         validated: true,
-        validationNote: "Exact quote found in fetched primary-source markdown.",
+        validationNote: finding.startSeconds !== undefined
+          ? "Exact quote found in VideoDB's timestamped spoken-word transcript."
+          : "Exact quote found in fetched primary-source markdown.",
         createdAt: Date.now(),
       });
       const judgmentId = await ctx.db.insert("judgments", {
@@ -363,8 +423,10 @@ export const fail = internalMutation({
 export const cancel = mutation({
   args: { runId: v.id("researchRuns") },
   handler: async (ctx, { runId }) => {
+    const { workspace } = await requireWorkspace(ctx);
     const run = await ctx.db.get(runId);
-    if (!run || ["published", "failed", "cancelled"].includes(run.status)) return;
+    if (!run || run.workspaceId !== workspace._id) throw new Error("Research run not found.");
+    if (["published", "failed", "cancelled"].includes(run.status)) return;
     await ctx.db.patch(runId, {
       status: "cancelled",
       phase: "Cancelled by user",
@@ -388,8 +450,9 @@ export const cancel = mutation({
 export const get = query({
   args: { runId: v.id("researchRuns") },
   handler: async (ctx, { runId }) => {
+    const { workspace } = await requireWorkspace(ctx);
     const run = await ctx.db.get(runId);
-    if (!run) return null;
+    if (!run || run.workspaceId !== workspace._id) return null;
     const [focus, tasteDoc, steps, events, candidates] = await Promise.all([
       ctx.db.get(run.focusThreadId),
       ctx.db.get(run.tasteDocVersionId),
@@ -437,13 +500,9 @@ export const cleanupFailedRuns = internalMutation({
 });
 
 export const list = query({
-  args: { workspaceKey: v.string() },
-  handler: async (ctx, { workspaceKey }) => {
-    const workspace = await ctx.db
-      .query("workspaces")
-      .withIndex("by_key", (q) => q.eq("key", workspaceKey))
-      .unique();
-    if (!workspace) return [];
+  args: {},
+  handler: async (ctx) => {
+    const { workspace } = await requireWorkspace(ctx);
     const runs = await ctx.db
       .query("researchRuns")
       .withIndex("by_workspace", (q) => q.eq("workspaceId", workspace._id))

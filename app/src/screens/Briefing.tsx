@@ -16,16 +16,17 @@ import {
   Lightbulb,
   Link2,
   MessageSquareText,
+  PlayCircle,
   Quote,
   Scale,
   ShieldCheck,
   Sparkles,
+  Video,
   X,
 } from "lucide-react";
 import { LoadingState, Metric, Status } from "../components/UI";
-import { compactId, formatDate, scoreTone, sentenceCase } from "../lib/format";
+import { compactId, formatDate, mediaTimestamp, scoreTone } from "../lib/format";
 import { navigate } from "../lib/routes";
-import { WORKSPACE_KEY } from "../lib/config";
 
 const sectionLabels: Record<string, { label: string; icon: typeof Sparkles }> = {
   must_know: { label: "Must know now", icon: Sparkles },
@@ -64,7 +65,6 @@ function FeedbackDialog({
     event.preventDefault();
     setSaving(true);
     const result = await record({
-      workspaceKey: WORKSPACE_KEY,
       briefingId: finding.section.briefingId,
       judgmentId: finding.judgment._id,
       reason,
@@ -137,7 +137,7 @@ export default function Briefing({ id }: { id: string }) {
               return (
                 <article key={finding.judgment._id} className={`finding-card ${selected?.judgment._id === finding.judgment._id ? "selected" : ""}`} onClick={() => setSelectedId(finding.judgment._id)}>
                   <div className="finding-number"><Icon size={15} /><code>0{index + 1}</code></div>
-                  <div className="finding-copy"><span><code>{meta.label}</code><Status tone="good">validated</Status></span><h2>{finding.claim.text}</h2><p>{finding.judgment.explanation}</p><div><span><Clock3 size={11} /> {finding.judgment.attentionMinutes} min</span><span><Link2 size={11} /> {finding.candidate?.sourceName}</span></div></div>
+                  <div className="finding-copy"><span><code>{meta.label}</code><Status tone="good">validated</Status></span><h2>{finding.claim.text}</h2><p>{finding.judgment.explanation}</p><div><span><Clock3 size={11} /> {finding.judgment.attentionMinutes} min</span><span><Link2 size={11} /> {finding.candidate?.sourceName}</span>{finding.chunk?.startSeconds !== undefined && <span><Video size={11} /> {mediaTimestamp(finding.chunk.startSeconds)}</span>}</div></div>
                   <ArrowRight size={16} />
                 </article>
               );
@@ -156,7 +156,7 @@ export default function Briefing({ id }: { id: string }) {
         {selected && <aside className="evidence-panel">
           <div className="evidence-heading"><code>EVIDENCE SPINE · {compactId(selected.claim._id, "CLAIM ")}</code><Status tone="good">exact match</Status><h2>{selected.claim.text}</h2></div>
           <div className="panel-rule" />
-          <div className="evidence-section"><span><Quote size={14} /><code>EXACT SOURCE PASSAGE</code></span><blockquote>{selected.claim.evidenceQuote}</blockquote><div className="citation"><strong>{selected.candidate?.title}</strong><small>{selected.chunk?.locator}</small><a href={selected.candidate?.url} target="_blank" rel="noreferrer">Open primary source <ExternalLink size={12} /></a></div></div>
+          <div className="evidence-section"><span><Quote size={14} /><code>EXACT SOURCE PASSAGE</code></span><blockquote>{selected.claim.evidenceQuote}</blockquote><div className="citation"><strong>{selected.candidate?.title}</strong><small>{selected.chunk?.locator}</small><a href={selected.candidate?.url} target="_blank" rel="noreferrer">Open primary source <ExternalLink size={12} /></a></div>{selected.chunk?.startSeconds !== undefined && selected.chunk.playerUrl && <a className="video-moment" href={selected.chunk.playerUrl} target="_blank" rel="noreferrer"><PlayCircle size={19} /><span><strong>Play exact VideoDB moment</strong><small>{mediaTimestamp(selected.chunk.startSeconds)}–{mediaTimestamp(selected.chunk.endSeconds)} · timestamped transcript evidence</small></span><ExternalLink size={13} /></a>}</div>
           <div className="panel-rule" />
           <div className="evidence-section"><span><Scale size={14} /><code>PERSONAL JUDGMENT</code></span><p>{selected.judgment.explanation}</p><div className="why-now"><strong>WHY NOW</strong><p>{selected.judgment.whyNow}</p></div></div>
           <div className="score-grid">

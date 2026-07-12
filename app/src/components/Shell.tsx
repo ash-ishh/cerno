@@ -7,13 +7,14 @@ import {
   FileText,
   FlaskConical,
   ListTree,
+  LogOut,
   Plus,
   SlidersHorizontal,
 } from "lucide-react";
 import type { Route } from "../lib/routes";
 import { navigate } from "../lib/routes";
-import { WORKSPACE_KEY } from "../lib/config";
 import { compactId } from "../lib/format";
+import { useOptionalFirebaseSession } from "../lib/firebase";
 
 const navItems = [
   { id: "desk", label: "Briefing desk", icon: BookOpen, target: "desk" },
@@ -50,8 +51,9 @@ export default function Shell({
   title: string;
   children: ReactNode;
 }) {
-  const briefings = useQuery(api.briefings.list, { workspaceKey: WORKSPACE_KEY });
-  const runs = useQuery(api.research.list, { workspaceKey: WORKSPACE_KEY });
+  const briefings = useQuery(api.briefings.list, {});
+  const runs = useQuery(api.research.list, {});
+  const authSession = useOptionalFirebaseSession();
   const running = runs?.filter((run) => !["published", "failed", "cancelled"].includes(run.status)).length ?? 0;
   const active = activeNav(route);
 
@@ -100,7 +102,7 @@ export default function Shell({
         <div className="runtime-card">
           <span><FlaskConical size={13} /> LIVE APPLICATION</span>
           <strong>{running ? `${running} research run${running === 1 ? "" : "s"} active` : "Runtime ready"}</strong>
-          <code>CONVEX · LINKUP · HERMES</code>
+          <code>CONVEX · LINKUP · VIDEODB · HERMES</code>
         </div>
       </aside>
 
@@ -115,7 +117,11 @@ export default function Shell({
             {running ? `${running} live run${running === 1 ? "" : "s"}` : "Systems ready"}
           </div>
           <div className="topbar-actions">
-            <button className="button secondary compact" onClick={() => navigate("threads")}>
+            <span className="signed-in-user" title={authSession?.user?.email ?? undefined}>{authSession?.user?.email ?? "Local auth bypass"}</span>
+            {authSession && <button className="button secondary compact sign-out" onClick={() => void authSession.signOut()} title="Sign out">
+              <LogOut size={14} /><span>Sign out</span>
+            </button>}
+            <button className="button secondary compact focus-shortcut" onClick={() => navigate("threads")}>
               <SlidersHorizontal size={14} /> Focus threads
             </button>
             <button className="button primary compact" onClick={() => navigate("new-focus")}>

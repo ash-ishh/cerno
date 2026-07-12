@@ -5,4 +5,5 @@ data/
 node_modules/
 dist/
 *.tsbuildinfo
+.wrangler/
 .DS_Store

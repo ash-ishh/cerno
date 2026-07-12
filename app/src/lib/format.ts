@@ -16,6 +16,17 @@ export function duration(start?: number, end?: number) {
   return `${Math.floor(seconds / 60)}m ${seconds % 60}s`;
 }
 
+export function mediaTimestamp(seconds?: number) {
+  if (seconds === undefined) return "—";
+  const total = Math.max(0, Math.floor(seconds));
+  const hours = Math.floor(total / 3600);
+  const minutes = Math.floor((total % 3600) / 60);
+  const remainder = total % 60;
+  return hours > 0
+    ? `${hours}:${String(minutes).padStart(2, "0")}:${String(remainder).padStart(2, "0")}`
+    : `${minutes}:${String(remainder).padStart(2, "0")}`;
+}
+
 export function compactId(id?: string, prefix = "") {
   if (!id) return "—";
   return `${prefix}${id.slice(-5).toUpperCase()}`;

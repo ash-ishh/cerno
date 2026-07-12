@@ -1,9 +1,9 @@
 import { mutation, query } from "./_generated/server";
 import { internal } from "./_generated/api";
 import { v } from "convex/values";
+import { requireWorkspace } from "./auth";
 
 const focusArgs = {
-  workspaceKey: v.string(),
   title: v.string(),
   currentWork: v.string(),
   outcome: v.string(),
@@ -18,14 +18,10 @@ const focusArgs = {
 export const createAndRun = mutation({
   args: focusArgs,
   handler: async (ctx, args) => {
-    if (!args.sourceScope.some((scope) => scope === "Live web" || scope === "Research papers")) {
-      throw new Error("Select Live web or Research papers for the current research lane.");
+    if (!args.sourceScope.some((scope) => scope === "Live web" || scope === "Research papers" || scope === "Long-form video")) {
+      throw new Error("Select at least one live source lane: web, papers, or long-form video.");
     }
-    const workspace = await ctx.db
-      .query("workspaces")
-      .withIndex("by_key", (q) => q.eq("key", args.workspaceKey))
-      .unique();
-    if (!workspace) throw new Error("Workspace is not initialized.");
+    const { workspace } = await requireWorkspace(ctx);
 
     const tasteVersions = await ctx.db
       .query("tasteDocVersions")
@@ -95,8 +91,9 @@ export const createAndRun = mutation({
 export const rerun = mutation({
   args: { focusThreadId: v.id("focusThreads") },
   handler: async (ctx, { focusThreadId }) => {
+    const { workspace } = await requireWorkspace(ctx);
     const focus = await ctx.db.get(focusThreadId);
-    if (!focus) throw new Error("Focus Thread not found.");
+    if (!focus || focus.workspaceId !== workspace._id) throw new Error("Focus Thread not found.");
     const tasteVersions = await ctx.db
       .query("tasteDocVersions")
       .withIndex("by_workspace", (q) => q.eq("workspaceId", focus.workspaceId))
@@ -146,13 +143,9 @@ export const rerun = mutation({
 });
 
 export const list = query({
-  args: { workspaceKey: v.string() },
-  handler: async (ctx, { workspaceKey }) => {
-    const workspace = await ctx.db
-      .query("workspaces")
-      .withIndex("by_key", (q) => q.eq("key", workspaceKey))
-      .unique();
-    if (!workspace) return [];
+  args: {},
+  handler: async (ctx) => {
+    const { workspace } = await requireWorkspace(ctx);
     const threads = await ctx.db
       .query("focusThreads")
       .withIndex("by_workspace", (q) => q.eq("workspaceId", workspace._id))
@@ -184,8 +177,9 @@ export const list = query({
 export const get = query({
   args: { focusThreadId: v.id("focusThreads") },
   handler: async (ctx, { focusThreadId }) => {
+    const { workspace } = await requireWorkspace(ctx);
     const thread = await ctx.db.get(focusThreadId);
-    if (!thread) return null;
+    if (!thread || thread.workspaceId !== workspace._id) return null;
     const runs = await ctx.db
       .query("researchRuns")
       .withIndex("by_focus", (q) => q.eq("focusThreadId", focusThreadId))

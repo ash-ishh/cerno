@@ -8,8 +8,10 @@
  * @module
  */
 
+import type * as auth from "../auth.js";
 import type * as briefings from "../briefings.js";
 import type * as focusThreads from "../focusThreads.js";
+import type * as lib_videoDb from "../lib/videoDb.js";
 import type * as research from "../research.js";
 import type * as researchAction from "../researchAction.js";
 import type * as taste from "../taste.js";
@@ -22,8 +24,10 @@ import type {
 } from "convex/server";
 
 declare const fullApi: ApiFromModules<{
+  auth: typeof auth;
   briefings: typeof briefings;
   focusThreads: typeof focusThreads;
+  "lib/videoDb": typeof lib_videoDb;
   research: typeof research;
   researchAction: typeof researchAction;
   taste: typeof taste;

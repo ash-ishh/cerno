@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 import { useMutation, useQuery } from "convex/react";
 import { api } from "../convex/_generated/api";
 import Shell from "./components/Shell";
-import { WORKSPACE_KEY } from "./lib/config";
 import { useRoute } from "./lib/routes";
 import BriefingDesk from "./screens/BriefingDesk";
 import NewFocus from "./screens/NewFocus";
@@ -28,11 +27,11 @@ function routeMeta(route: ReturnType<typeof useRoute>) {
 export default function App() {
   const route = useRoute();
   const ensure = useMutation(api.workspaces.ensure);
-  const workspace = useQuery(api.workspaces.get, { key: WORKSPACE_KEY });
+  const workspace = useQuery(api.workspaces.get, {});
   const [setupError, setSetupError] = useState("");
 
   useEffect(() => {
-    ensure({ key: WORKSPACE_KEY }).catch((error) => setSetupError(error instanceof Error ? error.message : "Could not initialize Cerno."));
+    ensure({}).catch((error) => setSetupError(error instanceof Error ? error.message : "Could not initialize Cerno."));
   }, [ensure]);
 
   const [eyebrow, title] = routeMeta(route);

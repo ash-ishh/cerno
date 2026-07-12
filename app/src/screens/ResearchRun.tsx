@@ -103,7 +103,7 @@ export default function ResearchRun({ id }: { id: string }) {
           {run.candidates.map((candidate) => (
             <article key={candidate._id}>
               <span className={`candidate-state ${candidate.status}`} />
-              <div><strong>{candidate.title}</strong><small>{candidate.sourceName} · {candidate.contentType}</small>{candidate.rejectionReason && <p>{candidate.rejectionReason}</p>}</div>
+              <div><strong>{candidate.title}</strong><small>{candidate.sourceName} · {candidate.contentType}{candidate.videoDbId ? " · VideoDB indexed" : ""}</small>{candidate.rejectionReason && <p>{candidate.rejectionReason}</p>}</div>
               <Status tone={candidate.status === "accepted" ? "good" : candidate.status === "unavailable" ? "bad" : candidate.status === "rejected" ? "warn" : candidate.status === "consumed" ? "live" : "neutral"}>{candidate.status}</Status>
               <a href={candidate.url} target="_blank" rel="noreferrer" aria-label={`Open ${candidate.title}`}><ExternalLink size={13} /></a>
             </article>

@@ -29,7 +29,7 @@ wrangler pages deploy public --project-name cerno-buildathon --branch main
 - Use the navigation or scroll normally.
 - `PageDown` / `ArrowDown` advances between major sections.
 - `PageUp` / `ArrowUp` goes back.
-- The live product section switches between the briefing and execution trace.
+- **Open live app** launches the authenticated production application in a new tab.
 
 ## Sponsor stack shown on the site
 
@@ -39,4 +39,4 @@ wrangler pages deploy public --project-name cerno-buildathon --branch main
 - **Cloudflare** — public edge hosting for this website
 - **Hermes** — Research Director orchestration and native delegation
 
-Verified metrics and honesty boundaries are sourced from `../docs/LIVE-VERIFICATION.md`.
+The production presentation metrics and receipts are documented in `../presentation/PITCH-SCRIPT.md`; the original local verification record remains in `../docs/LIVE-VERIFICATION.md`.

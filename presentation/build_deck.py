@@ -167,9 +167,9 @@ fill_background(slide, GREEN_DARK)
 add_logo(slide, inverse=True)
 add_text(slide, "GROWTHX × HERMES BUILDATHON", 9.25, 0.47, 3.4, 0.2, size=8.5,
          color="AFC0BA", font=FONT_MONO, bold=True, align=PP_ALIGN.RIGHT)
-add_text(slide, "The judgment layer between\nthe internet and your attention.", 0.72, 1.02, 11.5, 1.4,
-         size=33, color=WHITE, font=FONT_SERIF, bold=True, line_spacing=0.92)
-add_text(slide, "A personal research-and-briefing desk, run by agents.", 0.76, 2.48, 8.3, 0.36,
+add_text(slide, "Your personal research desk.\nStaffed by agents.", 0.72, 1.02, 11.5, 1.4,
+         size=36, color=WHITE, font=FONT_SERIF, bold=True, line_spacing=0.92)
+add_text(slide, "One mission in. One finite, cited briefing out.", 0.76, 2.48, 8.3, 0.36,
          size=14, color="C8D8D4")
 slide.shapes.add_picture(str(MEDIA / "cerno-banner.png"), Inches(0), Inches(2.88),
                          width=Inches(SW), height=Inches(4.67))
@@ -332,31 +332,31 @@ add_footer(slide, 5)
 slide = prs.slides.add_slide(blank)
 fill_background(slide)
 add_logo(slide)
-add_label(slide, "Verified live run · 12 Jul 2026", 0.72, 0.93, 3.4)
-add_text(slide, "One run. Every claim inspectable.", 0.72, 1.22, 11.8, 0.62,
+add_label(slide, "Verified production runs · 12 Jul 2026", 0.72, 0.93, 3.8)
+add_text(slide, "Two missions. Every claim inspectable.", 0.72, 1.22, 11.8, 0.62,
          size=28, font=FONT_SERIF, bold=True)
-metric_card(slide, 0.72, 2.03, 2.56, "102.6s", "wall-clock", "local app + remote Hermes")
-metric_card(slide, 3.46, 2.03, 2.56, "7 → 4 → 3", "discovered · fetched · published", "progressive-depth research")
-metric_card(slide, 6.20, 2.03, 2.56, "4", "rejected + preserved", "nothing silently disappears", accent=OXIDE)
-metric_card(slide, 8.94, 2.03, 3.66, "3 specialists", "one native delegation", "two analysts + personal editor", accent=AMBER)
+metric_card(slide, 0.72, 2.03, 2.56, "2", "production briefings", "authenticated Convex workspace")
+metric_card(slide, 3.46, 2.03, 2.56, "14 → 8 → 6", "discovered · consumed · published", "full sources beyond snippets")
+metric_card(slide, 6.20, 2.03, 2.56, "8", "rejected + preserved", "judgment remains inspectable", accent=OXIDE)
+metric_card(slide, 8.94, 2.03, 3.66, "2 exact clips", "timestamp-bounded VideoDB streams", "8.72s + 16.66s", accent=AMBER)
 # Receipt card
 add_rect(slide, 0.72, 3.42, 7.52, 2.88, fill=GREEN_DARK, radius=True)
 add_label(slide, "Evidence receipt", 1.02, 3.71, 1.7, color="9CE1D3")
 add_text(slide, "“The result is four recurring failure modes: unregulated growth, missing semantic revision, capacity-driven forgetting, and read-only retrieval.”",
          1.02, 4.08, 6.75, 0.92, size=16, color=WHITE, font=FONT_SERIF, bold=True, line_spacing=1.06)
-add_text(slide, "SOURCE  arxiv.org/html/2605.26252v1\nLOCATOR Is Agent Memory a Database? · paragraph 12\nSHA-256 61475cf3…97fa7564",
+add_text(slide, "SOURCE  arxiv.org/abs/2605.26252\nLOCATOR Is Agent Memory a Database? · paragraph 13\nSHA-256 f8853e7c…1432385b",
          1.02, 5.21, 6.58, 0.64, size=8.5, color="AFC0BA", font=FONT_MONO, line_spacing=1.18)
-add_text(slide, "Exact substring check passed before publication.", 1.02, 5.94, 5.7, 0.18,
+add_text(slide, "6 / 6 production claims passed exact evidence validation.", 1.02, 5.94, 5.7, 0.18,
          size=8.5, color="9CE1D3", font=FONT_MONO, bold=True)
 # Integrity checklist
 add_rect(slide, 8.50, 3.42, 4.10, 2.88, fill=PAPER, line=LINE, radius=True)
-add_label(slide, "What the receipt proves", 8.82, 3.71, 2.35)
+add_label(slide, "What the receipts prove", 8.82, 3.71, 2.35)
 proofs = [
+    "Public app + identity-owned workspace",
     "Live LinkUp discovery + primary fetch",
-    "Hermes run + delegation receipt persisted",
-    "3 exact-matched findings; snippets excluded",
-    "VideoDB exact moment at 0:30–0:44 playable",
-    "Feedback approved as visible TasteDoc v2",
+    "2 Hermes native delegation receipts",
+    "6 exact-matched findings; snippets excluded",
+    "2 timestamp-bounded VideoDB clips",
 ]
 for i, text in enumerate(proofs):
     y = 4.12 + i * 0.38
@@ -364,7 +364,7 @@ for i, text in enumerate(proofs):
     add_text(slide, "✓", 8.84, y - 0.01, 0.18, 0.18, size=7, color=WHITE, bold=True,
              align=PP_ALIGN.CENTER, valign=MSO_ANCHOR.MIDDLE)
     add_text(slide, text, 9.16, y - 0.02, 3.08, 0.23, size=9.5, color=MUTED)
-add_text(slide, "HONESTY BOUNDARY · VideoDB is a separate one-source receipt; no product users, traffic, or model cost claimed",
+add_text(slide, "HONESTY BOUNDARY · production receipts are real; external users, traffic, and verified model cost are not claimed",
          0.74, 6.61, 11.85, 0.22, size=7.3, color=OXIDE, font=FONT_MONO, bold=True)
 add_footer(slide, 6)
 
@@ -373,9 +373,9 @@ add_footer(slide, 6)
 slide = prs.slides.add_slide(blank)
 fill_background(slide, GREEN_DARK)
 add_logo(slide, inverse=True)
-add_text(slide, "Most tools help you consume faster.", 0.74, 1.26, 11.4, 0.50,
+add_text(slide, "The internet will keep getting bigger.", 0.74, 1.26, 11.4, 0.50,
          size=23, color="AFC0BA", font=FONT_SERIF)
-add_text(slide, "Cerno decides what deserves\nto be consumed at all.", 0.74, 1.88, 11.5, 1.48,
+add_text(slide, "Your attention will not.\nCerno decides what deserves it.", 0.74, 1.88, 11.5, 1.48,
          size=36, color=WHITE, font=FONT_SERIF, bold=True, line_spacing=0.94)
 # Principles
 principles = ["FINITE BRIEFINGS", "VISIBLE TASTE", "CITED EVIDENCE", "NO FEED"]
@@ -385,7 +385,7 @@ for i, item in enumerate(principles):
     add_text(slide, item, x + 0.12, 4.15, 2.40, 0.18, size=8.2, color="9CE1D3",
              font=FONT_MONO, bold=True, align=PP_ALIGN.CENTER)
 add_line(slide, 0.74, 5.14, 12.60, 5.14, "315B51", 1.0)
-add_text(slide, "Consume less. Understand more.", 0.74, 5.55, 8.2, 0.52,
+add_text(slide, "One mission in. One trusted briefing out.", 0.74, 5.55, 8.8, 0.52,
          size=27, color=WHITE, font=FONT_SERIF, bold=True)
 add_text(slide, "cernere · to sift, distinguish, and decide", 0.77, 6.20, 5.4, 0.24,
          size=9, color="AFC0BA", font=FONT_MONO)
@@ -395,7 +395,7 @@ add_footer(slide, 7, dark=True)
 
 
 # Presentation metadata
-prs.core_properties.title = "Cerno — The judgment layer between the internet and your attention"
+prs.core_properties.title = "Cerno — Your personal research desk, staffed by agents"
 prs.core_properties.subject = "GrowthX × Hermes Buildathon — AI as Agency"
 prs.core_properties.author = "Cerno"
 prs.core_properties.keywords = "Cerno, Hermes, AI as Agency, research agents, finite briefing"

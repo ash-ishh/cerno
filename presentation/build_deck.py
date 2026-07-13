@@ -167,9 +167,9 @@ fill_background(slide, GREEN_DARK)
 add_logo(slide, inverse=True)
 add_text(slide, "GROWTHX × HERMES BUILDATHON", 9.25, 0.47, 3.4, 0.2, size=8.5,
          color="AFC0BA", font=FONT_MONO, bold=True, align=PP_ALIGN.RIGHT)
-add_text(slide, "Your personal research desk.\nStaffed by agents.", 0.72, 1.02, 11.5, 1.4,
-         size=36, color=WHITE, font=FONT_SERIF, bold=True, line_spacing=0.92)
-add_text(slide, "One mission in. One finite, cited briefing out.", 0.76, 2.48, 8.3, 0.36,
+add_text(slide, "The judgment layer between\nthe internet and your attention.", 0.72, 1.02, 11.5, 1.4,
+         size=33, color=WHITE, font=FONT_SERIF, bold=True, line_spacing=0.92)
+add_text(slide, "A personal research-and-briefing desk, run by agents.", 0.76, 2.48, 8.3, 0.36,
          size=14, color="C8D8D4")
 slide.shapes.add_picture(str(MEDIA / "cerno-banner.png"), Inches(0), Inches(2.88),
                          width=Inches(SW), height=Inches(4.67))
@@ -395,7 +395,7 @@ add_footer(slide, 7, dark=True)
 
 
 # Presentation metadata
-prs.core_properties.title = "Cerno — Your personal research desk, staffed by agents"
+prs.core_properties.title = "Cerno — The judgment layer between the internet and your attention"
 prs.core_properties.subject = "GrowthX × Hermes Buildathon — AI as Agency"
 prs.core_properties.author = "Cerno"
 prs.core_properties.keywords = "Cerno, Hermes, AI as Agency, research agents, finite briefing"

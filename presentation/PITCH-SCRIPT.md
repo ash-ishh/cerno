@@ -2,7 +2,7 @@
 
 ## The one idea
 
-**Cerno is your personal research desk, staffed by agents. One mission goes in. One finite, cited briefing comes out.**
+**Cerno is the judgment layer between the internet and your attention. It works as an agent-run personal research desk: one mission goes in, and one finite, cited briefing comes out.**
 
 The presentation should feel like a product reveal, not an architecture tour. Show the finished work first. Then reveal the agency, evidence system, and production receipt behind it.
 
@@ -26,7 +26,9 @@ Preload the VideoDB player so the exact 8.72-second clip opens immediately. Keep
 >
 > But deciding what deserves our attention is still manual.
 >
-> So I built Cerno: your personal research desk, staffed by agents.
+> So I built Cerno: the judgment layer between the internet and your attention.
+>
+> It works like a personal research desk, run by agents.
 
 Pause, then switch directly to the live product.
 
@@ -168,7 +170,7 @@ The public React application, Firebase authentication, identity-owned Convex wor
 
 ### Judged path
 
-1. **Cover** — your personal research desk, staffed by agents
+1. **Cover** — the judgment layer between the internet and your attention
 2. **Live application** — briefing → exact clip → rejection → run trace
 3. **Production proof** — aggregate receipts from two completed missions
 4. **Close** — one mission in, one trusted briefing out
